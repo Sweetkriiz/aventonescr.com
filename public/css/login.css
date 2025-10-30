@@ -1,3 +1,4 @@
+
 * {
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
@@ -11,6 +12,12 @@ body {
   align-items: center;
   justify-content: center;
   background: #f8f9fc;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .login-container {
@@ -112,7 +119,7 @@ button:hover {
 
 p {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 a {

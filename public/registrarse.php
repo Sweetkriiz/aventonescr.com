@@ -18,8 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute([$nombreUsuario, $contrasena, $nombre, $apellidos, $cedula, $fechaNacimiento, $correo, $telefono]);
 
     echo "<p>Usuario registrado correctamente. <a href='views/login.php'>Iniciar sesión</a></p>";
-}
-?>
+}?>
 
 <!DOCTYPE html>
 <html lang="es">
@@ -28,65 +27,97 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Registro - Aventones CR</title>
   <link rel="stylesheet" href="css/registrarse.css">
 </head>
+
 <body>
+
+  <nav class="navbar">
+    <div class="navbar-left">
+      <img src="images/logo.png" alt="Logo Aventones" class="navbar-logo">
+      <span class="navbar-title">Aventones CR</span>
+    </div>
+    <div class="navbar-right">
+      <button class="navbar-btn">Publicar un viaje</button>
+    </div>
+  </nav>
+
+
   <div class="register-container">
-    <div class="content">
-      <img src="images/logo.png" alt="Logo Aventones" class="logo">
-      <h2>Crear cuenta Aventones</h2>
+    <div class="image-side">
+      <img src="images/login.png" alt="Registro Aventones">
+    </div>
 
-      <form action="register.php" method="POST">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre de usuario</label>
-            <input type="text" name="nombreUsuario" required>
-          </div>
+    <div class="form-side">
+      <h2>Crea tu cuenta</h2>
 
-          <div class="form-group">
-            <label>Contraseña</label>
-            <input type="password" name="contrasena" required>
-          </div>
-        </div>
+      <form method="POST" action="">
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" name="nombre" required>
-          </div>
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
 
-          <div class="form-group">
-            <label>Apellidos</label>
-            <input type="text" name="apellidos" required>
-          </div>
-        </div>
+        <label for="apellidos">Apellidos</label>
+        <input type="text" id="apellidos" name="apellidos" placeholder="Ingresa tus apellidos" required>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Cédula</label>
-            <input type="text" name="cedula" required>
-          </div>
+        <label for="cedula">Cédula</label>
+        <input type="text" id="cedula" name="cedula" placeholder="Ingresa tú identificación" required>
 
-          <div class="form-group">
-            <label>Fecha de nacimiento</label>
-            <input type="date" name="fechaNacimiento" required>
-          </div>
-        </div>
+        <label for="fechaNacimiento">Fecha de nacimiento</label>
+        <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Correo electrónico</label>
-            <input type="email" name="correo" required>
-          </div>
+        <label for="nombreUsuario">Nombre de usuario</label>
+        <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Elige un nombre de usuario" required>
 
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input type="tel" name="telefono" required>
-          </div>
-        </div>
+        <label for="correo">Correo electrónico</label>
+        <input type="email" id="correo" name="correo" placeholder="email@example.com" required>
 
-        <button type="submit">Registrarse</button>
-        <p class="switch">¿Ya tienes cuenta? <a href="login.php">Inicia sesión</a></p>
+        <label for="password">Contraseña</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+        <label for="contrasena">Confirmar Contraseña</label>
+        <input type="password" id="contrasena" name="contrasena" placeholder="••••••••" required>
+
+        <label for="telefono">Teléfono</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 8888-8888" required>
+
+        <button type="submit">Registrarme</button>
+        
       </form>
+
+      <p class="login-link">¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
     </div>
   </div>
+
+<footer class="footer">
+  <div class="footer-container">
+    <!-- 🔹 Sección izquierda -->
+    <div class="footer-left">
+      <h4>Acerca</h4>
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#">Acerca de nosotros</a></li>
+        <li><a href="#">Contáctanos</a></li>
+      </ul>
+    </div>
+
+    <!-- 🔹 Sección central -->
+    <div class="footer-center">
+      <img src="images/logo.png" alt="Logo Aventones" class="footer-logo">
+    </div>
+
+    <!-- 🔹 Sección derecha -->
+    <div class="footer-right">
+      <a href="#" class="social-icon facebook">f</a>
+      <a href="#" class="social-icon instagram">📸</a>
+    </div>
+  </div>
+
+  <!-- 🔹 Línea inferior -->
+  <div class="footer-bottom">
+    <p>©2025, Aventones CR</p>
+    <div class="footer-links">
+      <a href="#">Términos y Condiciones</a>
+      <a href="#">Políticas de Privacidad</a>
+    </div>
+  </div>
+</footer>
 </body>
 </html>
