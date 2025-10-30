@@ -24,6 +24,22 @@ body {
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
 
+.logo-login {
+    width: 200px;              
+    max-width: 90%;          
+    display: block;
+    margin: 0 auto 20px auto;  
+    object-fit: contain;
+    transition: transform 0.2s ease-in-out;
+}
+
+
+.logo-login:hover {
+    transform: scale(1.05);
+}
+
+
+
 .image-side {
   flex: 1;
   background: #f3f3f3;

@@ -44,14 +44,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Iniciar sesión - Aventones</title>
-    <link rel="stylesheet" href="public/css/login.css">
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
     <div class="login-container">
         <div class="image-side">
-            <img src="public/images/login.jpg" alt="imagen de login">
+            <img src="images\login.jpg" alt="imagen de login">
         </div>
         <div class="form-side">
+            <img src="images/logo.png" alt="Logo Aventones" class="logo-login">
             <h2>Iniciar sesión</h2>
 
             <?php if (!empty($error)): ?>
@@ -68,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <button type="submit">Entrar</button>
             </form>
 
-            <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+            <p>¿No tienes una cuenta? <a href="registrarse.php">Regístrate</a></p>
         </div>
     </div>
 </body>

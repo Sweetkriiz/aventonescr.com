@@ -1,11 +1,11 @@
 <?php
-require_once 'config/database.php';
+require_once '../config/database.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombreUsuario = $_POST['nombreUsuario'];
     $contrasena = $_POST['contrasena'];
     $nombre = $_POST['nombre'];
-    $apellidos = $_POST['apellidos'];
+    $apellidos = $_POST['apellidos'];   
     $cedula = $_POST['cedula'];
     $fechaNacimiento = $_POST['fechaNacimiento'];
     $correo = $_POST['correo'];
