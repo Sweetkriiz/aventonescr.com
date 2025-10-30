@@ -98,11 +98,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </ul>
     </div>
 
-    <!-- 🔹 Sección central -->
-    <div class="footer-center">
-      <img src="images/logo.png" alt="Logo Aventones" class="footer-logo">
-    </div>
-
     <!-- 🔹 Sección derecha -->
     <div class="footer-right">
       <a href="#" class="social-icon facebook">f</a>
