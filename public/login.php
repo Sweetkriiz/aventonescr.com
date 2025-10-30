@@ -4,56 +4,72 @@ require_once '../config/database.php';
 
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario = trim($_POST['usuario']);
-    $password = trim($_POST['password']);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $correo = trim($_POST["correo"]);
+    $password = trim($_POST["password"]);
 
-    $stmt = $pdo->prepare("SELECT * FROM Usuarios WHERE nombreUsuario = ?");
-    $stmt->execute([$usuario]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $sql = "SELECT * FROM Usuarios WHERE correo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $correo);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    if ($user && $password === $user['contrasena']) { 
-        // ⚠️ Nota: más adelante reemplazamos esto por password_verify()
-        $_SESSION['idUsuario'] = $user['idUsuario'];
-        $_SESSION['rol'] = $user['rol'];
-        $_SESSION['nombre'] = $user['nombre'];
+    if ($result->num_rows === 1) {
+        $usuario = $result->fetch_assoc();
+        
+        // Aquí usarías password_verify si guardaste hash
+        if ($password === $usuario["contrasena"]) { 
+            $_SESSION["usuario_id"] = $usuario["idUsuario"];
+            $_SESSION["rol"] = $usuario["rol"];
+            $_SESSION["nombre"] = $usuario["nombre"];
 
-        switch ($user['rol']) {
-            case 'administrador':
-                header("Location: ../views/admin/dashboard.php");
-                break;
-            case 'chofer':
-                header("Location: ../views/chofer/dashboard.php");
-                break;
-            default:
-                header("Location: ../views/pasajero/dashboard.php");
+            if ($usuario["rol"] === "administrador") {
+                header("Location: views/admin/panel.php");
+            } elseif ($usuario["rol"] === "chofer") {
+                header("Location: views/chofer/mis_viajes.php");
+            } else {
+                header("Location: views/pasajero/mis_rides.php");
+            }
+            exit;
+        } else {
+            $error = "Contraseña incorrecta.";
         }
-        exit;
     } else {
-        $error = "Usuario o contraseña incorrectos.";
+        $error = "No existe una cuenta con ese correo.";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Login | Aventones</title>
-    <link rel="stylesheet" href="../public/css/style.css">
+    <title>Iniciar sesión - Aventones</title>
+    <link rel="stylesheet" href="public/css/login.css">
 </head>
 <body>
-    <h2>Iniciar sesión</h2>
+    <div class="login-container">
+        <div class="image-side">
+            <img src="public/images/login.jpg" alt="imagen de login">
+        </div>
+        <div class="form-side">
+            <h2>Iniciar sesión</h2>
 
-    <form method="POST">
-        <input type="text" name="usuario" placeholder="Usuario" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <button type="submit">Entrar</button>
-    </form>
+            <?php if (!empty($error)): ?>
+                <div class="error"><?= $error ?></div>
+            <?php endif; ?>
 
-    <?php if ($error): ?>
-        <p style="color:red;"><?php echo $error; ?></p>
-    <?php endif; ?>
+            <form method="POST" action="">
+                <label for="correo">Correo electrónico</label>
+                <input type="email" id="correo" name="correo" placeholder="email@example.com" required>
+
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+
+                <button type="submit">Entrar</button>
+            </form>
+
+            <p>¿No tienes una cuenta? <a href="register.php">Regístrate</a></p>
+        </div>
+    </div>
 </body>
 </html>
-
