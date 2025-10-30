@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
     <div class="login-container">
         <div class="image-side">
-            <img src="images\login.jpg" alt="imagen de login">
+            <img src="images\login.png" alt="imagen de login">
         </div>
         <div class="form-side">
             <img src="images/logo.png" alt="Logo Aventones" class="logo-login">
