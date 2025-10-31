@@ -35,7 +35,7 @@ include('includes/navbar.php');
 <body class="bg-light">
 
   <!-- Carrusel -->
-  <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+  <div id="mainCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
     <div class="carousel-inner">
       <div class="carousel-item active">
         <img src="../images/banner1.jpg" class="d-block w-100" alt="...">
@@ -48,6 +48,9 @@ include('includes/navbar.php');
       </div>
        <div class="carousel-item">
         <img src="../images/banner4.jpg" class="d-block w-100" alt="...">
+      </div>
+      <div class="carousel-item">
+        <img src="../images/banner5.jpg" class="d-block w-100" alt="...">
       </div>
     </div>
   </div>
