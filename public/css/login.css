@@ -67,7 +67,7 @@ form {
 }
 
 h2 {
-  color: #2150b4;
+  color: #32864a;
   margin-bottom: 20px;
   text-align: center;
 }
@@ -90,7 +90,7 @@ input {
 button {
   margin-top: 25px;
   margin: 20px auto 0 auto;
-  background: linear-gradient(90deg, #3b3bff, #1d1dd9);
+  background: linear-gradient(90deg, #32864a, #285936);
   display: block;
   color: white;
   border: none;
@@ -104,7 +104,7 @@ button {
 }
 
 button:hover {
-  background: linear-gradient(90deg, #2a2ae6, #0000b8);
+  background: linear-gradient(90deg, #32864a, #285936);
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(42, 42, 230, 0.4);
 }
@@ -123,7 +123,7 @@ p {
 }
 
 a {
-  color: #3b3bff;
+  color: #32864a;
   text-decoration: none;
 }
 

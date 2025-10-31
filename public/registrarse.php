@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <nav class="navbar">
     <div class="navbar-left">
-      <img src="images/logo.png" alt="Logo Aventones" class="navbar-logo">
+      <img src="images/logo.jpeg" alt="Logo Aventones" class="navbar-logo">
       <span class="navbar-title">Aventones CR</span>
     </div>
     <div class="navbar-right">

@@ -1,3 +1,4 @@
+
 /* ====== General ====== */
 body {
   font-family: 'Poppins', Arial, sans-serif;
@@ -27,8 +28,8 @@ body {
 }
 
 .navbar-logo {
-  width: 45px;
-  height: 45px;
+  width: 100px;
+  height: 100px;
 }
 
 .navbar-title {
@@ -39,17 +40,17 @@ body {
 
 .navbar-right .navbar-btn {
   background: transparent;
-  border: 1.5px dashed #1d1dd9;
+  border: 1.5px dashed #285936;
   border-radius: 8px;
   padding: 10px 20px;
-  color: #1d1dd9;
+  color: #285936;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .navbar-btn:hover {
-  background: #1d1dd9;
+  background: #285936;
   color: white;
 }
 
@@ -92,7 +93,7 @@ body {
 
 .form-side h2 {
   text-align: center;
-  color: #1d1dd9;
+  color: #285936;
   margin-bottom: 30px;
 }
 
@@ -118,12 +119,12 @@ input {
 }
 
 input:focus {
-  border-color: #1d1dd9;
+  border-color: #32864a;
 }
 
 /* Botón principal */
 button {
-  background: #1d1dd9;
+  background: #285936;
   color: white;
   border: none;
   border-radius: 8px;
@@ -135,7 +136,7 @@ button {
 }
 
 button:hover {
-  background: #0000b8;
+  background: #32864a;
   transform: translateY(-2px);
 }
 
@@ -147,7 +148,7 @@ button:hover {
 }
 
 .login-link a {
-  color: #1d1dd9;
+  color: #32864a;
   font-weight: 600;
   text-decoration: none;
 }
@@ -197,14 +198,9 @@ button:hover {
 }
 
 .footer-left a:hover {
-  color: #1d1dd9;
+  color: #32864a;
 }
 
-/* 🔹 Centro */
-.footer-center {
-  text-align: center;
-  flex: 1;
-}
 
 .footer-logo {
   width: 90px;
@@ -226,7 +222,7 @@ button:hover {
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background: #1d1dd9;
+  background: #285936;
   color: #fff;
   font-size: 18px;
   text-decoration: none;
@@ -234,7 +230,7 @@ button:hover {
 }
 
 .social-icon:hover {
-  background: #0000b8;
+  background: #32864a;
   transform: scale(1.05);
 }
 
@@ -261,7 +257,7 @@ button:hover {
 }
 
 .footer-links a:hover {
-  color: #1d1dd9;
+  color: #32864a;
 }
 
 /* 🔹 Responsive */
