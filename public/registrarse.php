@@ -17,102 +17,125 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$nombreUsuario, $contrasena, $nombre, $apellidos, $cedula, $fechaNacimiento, $correo, $telefono]);
 
-    echo "<p>Usuario registrado correctamente. <a href='views/login.php'>Iniciar sesión</a></p>";
-}?>
+    echo "<p class='text-center mt-4'>Usuario registrado correctamente. <a href='login.php'>Iniciar sesión</a></p>";
+}
+?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Registro - Aventones CR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
   <link rel="stylesheet" href="css/registrarse.css">
 </head>
 
 <body>
-
-  <nav class="navbar">
-    <div class="navbar-left">
-      <img src="images/logo.jpeg" alt="Logo Aventones" class="navbar-logo">
-      <span class="navbar-title">Aventones CR</span>
-    </div>
-    <div class="navbar-right">
-      <button class="navbar-btn">Publicar un viaje</button>
+  <!-- 🔹 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <div class="container-fluid px-4">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="images/logo.jpeg" alt="Logo Aventones" class="navbar-logo me-2" style="height: 45px; border-radius: 50%;">
+        <span class="fw-bold text-success">Aventones CR</span>
+      </a>
+      <button class="btn btn-success ms-auto">Publicar un viaje</button>
     </div>
   </nav>
 
-
-  <div class="register-container">
-    <div class="image-side">
-      <img src="images/login.png" alt="Registro Aventones">
+  <!-- 🔹 Contenedor principal -->
+  <div class="register-container d-flex flex-wrap justify-content-center align-items-stretch my-5 shadow rounded overflow-hidden">
+    <div class="col-md-6 p-0 image-side">
+      <img src="images/login.png" alt="Registro Aventones" class="w-100 h-100" style="object-fit: cover;">
     </div>
 
-    <div class="form-side">
-      <h2>Crea tu cuenta</h2>
+    <div class="col-md-6 form-side p-5 bg-white">
+      <h2 class="text-center mb-4 ">Crea tu cuenta</h2>
 
-      <form method="POST" action="">
+      <form method="POST" action="" class="needs-validation" novalidate>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ingresa tu nombre" required>
+          </div>
 
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required>
+          <div class="col-md-6">
+            <label for="apellidos" class="form-label">Apellidos</label>
+            <input type="text" id="apellidos" name="apellidos" class="form-control" placeholder="Ingresa tus apellidos" required>
+          </div>
 
-        <label for="apellidos">Apellidos</label>
-        <input type="text" id="apellidos" name="apellidos" placeholder="Ingresa tus apellidos" required>
+          <div class="col-md-6">
+            <label for="cedula" class="form-label">Cédula</label>
+            <input type="text" id="cedula" name="cedula" class="form-control" placeholder="Ingresa tu identificación" required>
+          </div>
 
-        <label for="cedula">Cédula</label>
-        <input type="text" id="cedula" name="cedula" placeholder="Ingresa tú identificación" required>
+          <div class="col-md-6">
+            <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" required>
+          </div>
 
-        <label for="fechaNacimiento">Fecha de nacimiento</label>
-        <input type="date" id="fechaNacimiento" name="fechaNacimiento" required>
+          <div class="col-md-6">
+            <label for="nombreUsuario" class="form-label">Nombre de usuario</label>
+            <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-control" placeholder="Elige un nombre de usuario" required>
+          </div>
 
-        <label for="nombreUsuario">Nombre de usuario</label>
-        <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Elige un nombre de usuario" required>
+          <div class="col-md-6">
+            <label for="correo" class="form-label">Correo electrónico</label>
+            <input type="email" id="correo" name="correo" class="form-control" placeholder="email@example.com" required>
+          </div>
 
-        <label for="correo">Correo electrónico</label>
-        <input type="email" id="correo" name="correo" placeholder="email@example.com" required>
+          <div class="col-md-6">
+            <label for="password" class="form-label">Contraseña</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+          </div>
 
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" name="password" placeholder="••••••••" required>
+          <div class="col-md-6">
+            <label for="contrasena" class="form-label">Confirmar Contraseña</label>
+            <input type="password" id="contrasena" name="contrasena" class="form-control" placeholder="••••••••" required>
+          </div>
 
-        <label for="contrasena">Confirmar Contraseña</label>
-        <input type="password" id="contrasena" name="contrasena" placeholder="••••••••" required>
+          <div class="col-12">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="Ej: 8888-8888" required>
+          </div>
 
-        <label for="telefono">Teléfono</label>
-        <input type="tel" id="telefono" name="telefono" placeholder="Ej: 8888-8888" required>
-
-        <button type="submit">Registrarme</button>
-        
+          <div class="col-12">
+            <button type="submit" class="btn btn-success w-100 mt-3 py-2">Registrarme</button>
+          </div>
+        </div>
       </form>
 
-      <p class="login-link">¿Ya tienes una cuenta? <a href="login.php">Iniciar sesión</a></p>
+      <p class="text-center mt-3 mb-0">¿Ya tienes una cuenta? 
+        <a href="login.php" class="text-decoration-none text-success fw-semibold">Iniciar sesión</a>
+      </p>
     </div>
   </div>
 
-<footer class="footer">
-  <div class="footer-container">
-    <!-- 🔹 Sección izquierda -->
-    <div class="footer-left">
-      <h4>Acerca</h4>
-      <ul>
-        <li><a href="#">Inicio</a></li>
-        <li><a href="#">Acerca de nosotros</a></li>
-        <li><a href="#">Contáctanos</a></li>
-      </ul>
-    </div>
+  <!-- 🔹 Footer -->
+  <footer class="footer bg-light border-top mt-5 py-4">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <h5 class="fw-bold mb-2">Acerca</h5>
+        <ul class="list-unstyled mb-0">
+          <li><a href="#" class="text-decoration-none text-muted">Inicio</a></li>
+          <li><a href="#" class="text-decoration-none text-muted">Acerca de nosotros</a></li>
+          <li><a href="mailto:contacto@aventonescr.com" class="text-decoration-none text-muted">📧 contacto@aventonescr.com</a></li>
+          <li><a href="tel:+50688888888" class="text-decoration-none text-muted">📞 +506 8888-8888</a></li>
+        </ul>
 
-    <!-- 🔹 Sección derecha -->
-    <div class="footer-right">
-      <a href="#" class="social-icon facebook">f</a>
-      <a href="#" class="social-icon instagram">📸</a>
+      </div>
+      <div class="d-flex gap-3 fs-4">
+        <a href="#" class="text-success"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="text-success"><i class="bi bi-instagram"></i></a>
+      </div>
     </div>
-  </div>
+    <hr>
+    <div class="text-center small text-muted">
+      ©2025, Aventones CR — <a href="#" class="text-decoration-none text-muted">Términos</a> · <a href="#" class="text-decoration-none text-muted">Privacidad</a>
+    </div>
+  </footer>
 
-  <!-- 🔹 Línea inferior -->
-  <div class="footer-bottom">
-    <p>©2025, Aventones CR</p>
-    <div class="footer-links">
-      <a href="#">Términos y Condiciones</a>
-      <a href="#">Políticas de Privacidad</a>
-    </div>
-  </div>
-</footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
