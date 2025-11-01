@@ -39,7 +39,7 @@ include('includes/navbar.php');
 
     <!-- FORMULARIO flotante sobre la imagen -->
     <div class="position-absolute start-50 translate-middle-x bottom-0 mb-5 w-75 form-glass">
-      <form class="row g-3 justify-content-center">
+       <form id="buscarViajeForm" class="row g-3 justify-content-center">
         <div class="col-md-3">
           <label for="origen" class="form-label">Origen</label>
           <input type="text" class="form-control" id="origen" placeholder="Ej. San José" required>
@@ -84,6 +84,41 @@ include('includes/navbar.php');
       </div>
     </div>
   </section>
+
+  <!-- script JAVASCRIP -->
+   <script>
+  document.getElementById("buscarViajeForm").addEventListener("submit", function(e) {
+    e.preventDefault(); // evita que recargue la página
+
+    const origen = document.getElementById("origen");
+    const destino = document.getElementById("destino");
+    const fecha = document.getElementById("fecha");
+    const pasajeros = document.getElementById("pasajeros");
+
+    fetch("buscar_viaje.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        origen: origen.value.trim(),
+        destino: destino.value.trim(),
+        fecha: fecha.value,
+        pasajeros: pasajeros.value
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "ok" || data.status === "no_results") {
+        // Redirige siempre a resultados.php (maneja ambos casos)
+        window.location.href =
+          "resultados.php?origen=" + encodeURIComponent(origen.value) +
+          "&destino=" + encodeURIComponent(destino.value) +
+          "&fecha=" + encodeURIComponent(fecha.value) +
+          "&pasajeros=" + encodeURIComponent(pasajeros.value);
+      }
+    })
+    .catch(() => alert("Ocurrió un error al buscar viajes."));
+  });
+  </script>
 
   <!-- Footer -->
   <footer class="text-center py-3 bg-dark text-white">
