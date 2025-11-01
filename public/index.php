@@ -33,7 +33,7 @@ include('includes/navbar.php');
         ¿VAMOS EN LA MISMA DIRECCIÓN?
       </h2>
       <p class="text-white fs-5 text-shadow mb-0">
-        Comparte tu viaje y únete a la comunidad Aventones 🚗
+        Comparte tu viaje y únete a la comunidad Aventones CR
       </p>
     </div>
 

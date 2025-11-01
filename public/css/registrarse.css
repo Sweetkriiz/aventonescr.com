@@ -27,10 +27,12 @@ body {
   background: linear-gradient(90deg, #157347, #00936e);
 }
 
-.footer {
-  margin-top: 40px;
+footer {
+  background-color: #1a100b;
+  color: #fff;
 }
 
 .footer h5 {
   color: #198754;
+ 
 }

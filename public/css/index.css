@@ -2,10 +2,11 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Navbar */
+
 .navbar {
-  background-color: #1a100b !important; /* café elegante */
-}
+  background-color: #fcf8f6 !important;  
+} 
+
 
 .navbar-brand img {
   height: 80px;
@@ -16,17 +17,24 @@ body {
 }
 
 .btn-success {
-  background-color: #285936 !important;
+ background: linear-gradient(90deg, #198754, #00b894);
   border: none;
 }
 
 .btn-success:hover {
-  background-color: #1e4429 !important;
+  background: linear-gradient(90deg, #198754, #00b894);
+  border: none;
 }
 
+.btn-outline-light {
+  background: linear-gradient(90deg, #198754, #00b894);
+  border: none;
+} 
+
 .btn-outline-light:hover {
-  background-color: #fff !important;
-  color: #1a100b !important;
+  background: linear-gradient(90deg, #198754, #00b894);
+  border: none;
+  color: #fff !important;
 }
 
 /* Formulario translúcido */
@@ -68,4 +76,8 @@ img.w-100 {
 .form-glass:hover {
   background: rgba(255, 255, 255, 0.3); /* se ilumina un poco al pasar el mouse */
   transform: translateY(-3px);
+}
+
+.form-label {
+  font-weight: bold;
 }

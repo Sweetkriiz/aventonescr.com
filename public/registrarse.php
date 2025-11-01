@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-  <!-- 🔹 Navbar -->
+
   <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
     <div class="container-fluid px-4">
       <a class="navbar-brand d-flex align-items-center" href="#">
@@ -44,7 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </nav>
 
-  <!-- 🔹 Contenedor principal -->
   <div class="register-container d-flex flex-wrap justify-content-center align-items-stretch my-5 shadow rounded overflow-hidden">
     <div class="col-md-6 p-0 image-side">
       <img src="images/login.png" alt="Registro Aventones" class="w-100 h-100" style="object-fit: cover;">

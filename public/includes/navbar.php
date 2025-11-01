@@ -1,8 +1,10 @@
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="#">
       <img src="../images/logo.png" alt="Logo Aventones" height="70" class="me-2">
-      <span class="fw-bold fs-4 text-white">Aventones CR</span>
+      <span class="fw-bold fs-4" style="color: #198754;">Aventones CR</span>
+
     </a>
 
     <div class="d-flex">
