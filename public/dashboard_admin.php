@@ -7,6 +7,7 @@ require_once __DIR__ . '/../config/database.php';
 if (!isset($_SESSION["usuario"]) || $_SESSION["rol"] !== 'administrador') {
     header("Location: login.php");
     exit();
+    
 }
 ?>
 <!DOCTYPE html>
@@ -14,16 +15,17 @@ if (!isset($_SESSION["usuario"]) || $_SESSION["rol"] !== 'administrador') {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cerrar sesión</title>
+  <title>Aventones CR | Administración </title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="d-flex justify-content-center align-items-center vh-100 bg-light">
+<body class="bg-light">
+  <?php include('includes/navbar.php'); ?>
 
-  <a href="logout.php" class="btn btn-danger btn-lg">
-    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-  </a>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    
+  </div>
 
-  <!-- Iconos de Bootstrap (opcional) -->
+  <!-- Scripts Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
