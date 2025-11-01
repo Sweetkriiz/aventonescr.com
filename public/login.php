@@ -75,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             break;
 
         case 'chofer':
-            header("Location: dashboard_chofer.php");
+            header("Location: index.php");
             break;
 
         case 'pasajero':

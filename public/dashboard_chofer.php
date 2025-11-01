@@ -7,7 +7,7 @@ if (!isset($_SESSION["rol"]) || $_SESSION["rol"] != "chofer") {
   exit();
 }
 
-include('../includes/navbar.php');
+include('includes/navbar.php');
 ?>
 
 <!DOCTYPE html>
@@ -34,7 +34,7 @@ include('../includes/navbar.php');
 
   <!-- Título -->
   <div class="text-center mb-5">
-    <h1 class="fw-bold text-success">🚘 Panel del Chofer</h1>
+    <h1 class="fw-bold text-success">Bienvenido al Panel del Chofer</h1>
     <p class="text-muted">Bienvenido, <?php echo htmlspecialchars($_SESSION["usuario"] ?? "Chofer"); ?>.  
     Aquí puedes administrar tus vehículos, viajes y solicitudes.</p>
   </div>
@@ -54,7 +54,7 @@ include('../includes/navbar.php');
     <div class="col-md-4">
       <div class="card shadow-sm border-0 text-center">
         <div class="card-body">
-          <h5 class="card-title text-success fw-bold">Mis Viajes</h5>
+          <h5 class="card-title text-success fw-bold">Mis Rides</h5>
           <p class="card-text text-muted">Publica, edita o elimina tus viajes.</p>
           <a href="viajes.php" class="btn btn-success">Gestionar viajes</a>
         </div>
@@ -80,7 +80,7 @@ include('../includes/navbar.php');
         <li>Mantené actualizada la información de tus vehículos y tus rutas.</li>
         <li>Podés eliminar viajes vencidos desde la opción “Mis viajes”.</li>
         <li>Revisá frecuentemente las solicitudes pendientes para no perder pasajeros.</li>
-        <li>Recordá: la amabilidad y puntualidad aumentan tu calificación ⭐.</li>
+        <li>Recordá: la amabilidad y puntualidad aumentan tu calificación.</li>
       </ul>
     </div>
   </div>
