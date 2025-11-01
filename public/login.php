@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $nombreUsuario = trim($_POST["nombreUsuario"]);
     $password = trim($_POST["password"]);
 
-    // Buscar usuario por nombre de usuario
+    //Buscar usuario por nombre de usuario
     $sql = "SELECT * FROM Usuarios WHERE nombreUsuario = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $nombreUsuario);
@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($result->num_rows === 1) {
         $usuario = $result->fetch_assoc();
         
-        // ⚠️ Reemplaza por password_verify() si usas hashes
+        //Reemplaza por password_verify() si usas hashes
         if ($password === $usuario["contrasena"]) { 
             $_SESSION["usuario_id"] = $usuario["idUsuario"];
             $_SESSION["rol"] = $usuario["rol"];
