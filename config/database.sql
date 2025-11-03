@@ -32,15 +32,18 @@ CREATE TABLE Viajes (
   idViaje INT AUTO_INCREMENT PRIMARY KEY,
   idChofer INT NOT NULL,
   idVehiculo INT NOT NULL,
-  nombreViaje VARCHAR(150) NOT NULL,
-  lugarSalida VARCHAR(255) NOT NULL,
-  horaSalida TIME NOT NULL,
+  origen VARCHAR(255) NOT NULL,
   destino VARCHAR(255) NOT NULL,
+  fecha DATE NOT NULL,
+  horaSalida TIME NOT NULL,
   horaLlegada TIME NOT NULL,
-  diasSemana VARCHAR(50) NOT NULL,
   tarifa DECIMAL(10,2) NOT NULL,
-  espaciosDisponibles INT NOT NULL
+  espaciosDisponibles INT NOT NULL,
+  estado ENUM('activo','completado','cancelado') DEFAULT 'activo',
+  FOREIGN KEY (idChofer) REFERENCES Usuarios(idUsuario),
+  FOREIGN KEY (idVehiculo) REFERENCES Vehiculos(idVehiculo)
 );
+
 
 CREATE TABLE Reservas (
   idReserva INT AUTO_INCREMENT PRIMARY KEY,
@@ -100,3 +103,35 @@ VALUES
    'krisdaram@gmail.com', 
    '85833041', 
    'administrador');
+
+
+ALTER TABLE Usuarios
+ADD COLUMN estadoSolicitudChofer ENUM('ninguna', 'pendiente', 'aprobado', 'rechazado') 
+DEFAULT 'ninguna';
+
+INSERT INTO Vehiculos 
+(idChofer, marca, modelo, anio, color, placa, estado)
+VALUES 
+(3, 'Toyota', 'Corolla', 2020, 'Negro', 'LAR123', 'aprobado');
+
+INSERT INTO Viajes 
+(idChofer, idVehiculo, nombreViaje, lugarSalida, horaSalida, destino, horaLlegada, diasSemana, tarifa, espaciosDisponibles)
+VALUES 
+(3, 3, 'San Jose a Cartago - Mañana', 'San Jose', '07:30:00', 'Cartago', '08:30:00', 'Lunes, Martes, Miércoles', 1500.00, 3);
+
+UPDATE Usuarios
+SET contrasena = SHA2(contrasena, 256)
+WHERE LOWER(nombreUsuario) = 'admin';
+
+NUEVOS PARA LA BD KRISTEL
+
+ALTER TABLE Vehiculos ADD COLUMN motivoRechazo VARCHAR(255) NULL AFTER estado;
+
+SI TIENE VIAJES ELIMINELOS
+DELETE FROM Viajes WHERE idViaje = 1
+
+ALTER TABLE Viajes
+CHANGE COLUMN lugarSalida origen VARCHAR(255) NOT NULL,
+ADD COLUMN fecha DATE NOT NULL AFTER origen,
+DROP COLUMN diasSemana,
+ADD COLUMN estado ENUM('activo','completado','cancelado') DEFAULT 'activo';

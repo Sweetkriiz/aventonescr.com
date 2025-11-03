@@ -41,11 +41,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
             <!-- Opciones comunes -->
             <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person"></i> Mi perfil</a></li>
-            <li><a class="dropdown-item" href="mis_viajes.php"><i class="bi bi-calendar-check"></i> Mis viajes</a></li>
 
             <?php if ($rol === 'pasajero'): ?>
               <!-- Opciones solo para pasajeros -->
               <li><a class="dropdown-item" href="vehiculos.php"><i class="bi bi-car-front"></i> Quiero ser chofer</a></li>
+              <li><a class="dropdown-item" href="mis_viajes.php"><i class="bi bi-calendar-check"></i> Mis viajes</a></li>
             <?php elseif ($rol === 'chofer'): ?>
               <!-- Opciones solo para chofer -->
               <li><a class="dropdown-item" href="dashboard_chofer.php"><i class="bi bi-speedometer2"></i> Panel de chofer</a></li>

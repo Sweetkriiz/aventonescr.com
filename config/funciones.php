@@ -26,7 +26,4 @@ function crearUsuario($nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsu
     return $pdo->lastInsertId();
 }
 
-
-
-
 ?>

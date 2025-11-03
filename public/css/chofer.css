@@ -1,0 +1,168 @@
+/* ======== ESTILO GENERAL DEL DASHBOARD ======== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* TITULOS */
+h1, h4 {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+h4.text-success {
+  color: #198754 !important;
+}
+
+/* ======== NAV TABS (pestañas superiores) ======== */
+.nav-tabs {
+  border-bottom: 2px solid #198754;
+}
+
+.nav-tabs .nav-link {
+  font-weight: 600;
+  color: #198754;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: #eaf3ec;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #198754;
+  color: #fff !important;
+}
+
+/* ======== TABLAS ======== */
+.table-dashboard {
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  width: 100%;
+}
+
+.table-dashboard thead {
+  background: linear-gradient(90deg, #198754, #157347);
+  color: #fff !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-dashboard tbody tr:nth-child(odd) {
+  background-color: #f9f9f9 !important;
+}
+
+.table-dashboard tbody tr:nth-child(even) {
+  background-color: #eaf3ec !important;
+}
+
+.table-dashboard tbody tr:hover {
+  background-color: #dfeee3 !important;
+  transition: background-color 0.2s ease;
+}
+
+.table-dashboard td,
+.table-dashboard th {
+  vertical-align: middle;
+  padding: 12px 15px;
+}
+
+/* ======== BADGES ======== */
+.table-dashboard .badge {
+  font-size: 0.9rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.badge-pendiente {
+  background-color: #ffc107 !important;
+  color: #000;
+}
+
+.badge-aceptada {
+  background-color: #19ac39 !important;
+}
+
+.badge-rechazada,
+.badge-cancelada {
+  background-color: #dc3545 !important;
+}
+
+/* ======== BOTONES ======== */
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: scale(1.03);
+}
+
+.btn-success {
+  background-color: #198754;
+  border: none;
+  box-shadow: 0 2px 5px rgba(25, 135, 84, 0.3);
+}
+
+.btn-success:hover {
+  background-color: #157347;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border: none;
+  box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
+}
+
+.btn-danger:hover {
+  background-color: #bb2d3b;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: #000;
+  border: none;
+}
+
+/* ======== SECCIÓN DE CONSEJOS ======== */
+.consejos {
+  background: #f6fff8;
+  border-left: 6px solid #198754;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.consejos h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #198754;
+}
+
+.consejos ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.consejos li::before {
+  content: "• ";
+  color: #198754;
+  font-weight: bold;
+}
+
+.consejos li {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+/* ======== ALERTAS ======== */
+.alert {
+  border-radius: 10px;
+  font-weight: 500;
+}

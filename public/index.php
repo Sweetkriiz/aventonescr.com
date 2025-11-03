@@ -121,6 +121,20 @@ include('includes/navbar.php');
   });
   </script>
 
+<script>
+  
+  // Evitar selección de fechas pasadas
+  document.addEventListener("DOMContentLoaded", () => {
+    const inputFecha = document.getElementById("fecha");
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoy.getDate()).padStart(2, "0");
+    const fechaMinima = `${yyyy}-${mm}-${dd}`;
+    inputFecha.setAttribute("min", fechaMinima);
+  });
+</script>
+
   <!-- Footer -->
   <footer class="text-center py-3 bg-dark text-white">
     © 2025 Aventones CR
