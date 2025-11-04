@@ -14,26 +14,23 @@ if (session_status() === PHP_SESSION_NONE) {
       <span class="fw-bold fs-4" style="color: #198754;">Aventones CR</span>
     </a>
 
-    <div class="d-flex align-items-center">
-      <a href="verificar_publicacion.php" class="btn btn-success me-3">
-        <i class="bi bi-plus-circle"></i> Publicar viaje
-      </a>
+  
 
       <?php if (!isset($_SESSION['user_id'])): ?>
         <!-- Usuario NO logueado -->
         <a href="login.php" class="btn btn-outline-light">Iniciar sesión</a>
 
       <?php else: ?>
-        <!-- Usuario logueado -->
+        <!-- Usuario LOGUEADO -->
         <?php
-          // Rol y nombre formateados
-          $rol = ucfirst($_SESSION['rol'] ?? 'Usuario');
+          $rol = strtolower($_SESSION['rol'] ?? 'usuario');
           $nombre = htmlspecialchars($_SESSION['usuario'] ?? 'Invitado');
-          $textoUsuario = "$rol: $nombre";
+          $textoUsuario = ucfirst($rol) . ": " . $nombre;
         ?>
+
         <div class="dropdown">
-          <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center" 
-                  type="button" id="dropdownMenuButton" 
+          <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center"
+                  type="button" id="dropdownMenuButton"
                   data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-person-circle fs-5 me-2"></i>
             <?= $textoUsuario ?>
@@ -41,10 +38,22 @@ if (session_status() === PHP_SESSION_NONE) {
 
           <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="dropdownMenuButton">
             <li><h6 class="dropdown-header">Mi cuenta</h6></li>
-            <li><a class="dropdown-item" href="perfil.php">Perfil</a></li>
-            <li><a class="dropdown-item" href="mis_viajes.php">Mis Viajes</a></li>
-            <li><a class="dropdown-item" href="vehiculos.php">Mis carros</a></li>
+
+            <!-- Opciones comunes -->
+            <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person"></i> Mi perfil</a></li>
+
+            <?php if ($rol === 'pasajero'): ?>
+              <!-- Opciones solo para pasajeros -->
+              <li><a class="dropdown-item" href="vehiculos.php"><i class="bi bi-car-front"></i> Quiero ser chofer</a></li>
+              <li><a class="dropdown-item" href="mis_viajes.php"><i class="bi bi-calendar-check"></i> Mis viajes</a></li>
+            <?php elseif ($rol === 'chofer'): ?>
+              <!-- Opciones solo para chofer -->
+              <li><a class="dropdown-item" href="dashboard_chofer.php"><i class="bi bi-speedometer2"></i> Panel de chofer</a></li>
+            <?php endif; ?>
+
+            <li><a class="dropdown-item" href="index.php"><i class="bi bi-house-door"></i> Inicio</a></li>
             <li><hr class="dropdown-divider"></li>
+
             <li>
               <a class="dropdown-item text-danger" href="logout.php">
                 <i class="bi bi-box-arrow-right me-2"></i> Cerrar sesión
