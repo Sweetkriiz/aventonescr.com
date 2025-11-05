@@ -1,0 +1,61 @@
+body {
+  background-color: #f8f9fa;
+  font-family: 'Poppins', sans-serif;
+}
+
+h1 span {
+  color: #198754;
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Tarjetas */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+  height: 100%; /* ocupa toda la altura disponible */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* distribuye icono, texto y botón */
+  min-height: 260px; /* asegura altura uniforme */
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card h5 {
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  flex-grow: 1; /* empuja el botón hacia abajo */
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.btn-custom {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 10px 0;
+}
+
+.text-success i,
+.text-warning i,
+.text-primary i {
+  display: block;
+  margin-bottom: 10px;
+}
+
+p.text-muted {
+  font-size: 1rem;
+  color: #6c757d !important;
+}
+
