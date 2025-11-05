@@ -1,5 +1,18 @@
 
 <?php 
+
+require_once __DIR__ . '/database.php'; 
+
+
+// Función para obtener todos los usuarios
+function obtenerUsuarios() {
+  global $pdo;
+  $stmt = $pdo->query("SELECT idUsuario, nombre, apellidos, correo, telefono, rol FROM Usuarios ORDER BY idUsuario DESC");
+  return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+}
+
+
+
 //Función para verificar si el usuario está autenticado
 function checkAuth(){
     if(session_status() === PHP_SESSION_NONE){
@@ -25,5 +38,8 @@ function crearUsuario($nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsu
     
     return $pdo->lastInsertId();
 }
+
+//Función para eliminar un usuario
+
 
 ?>

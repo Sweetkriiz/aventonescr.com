@@ -2,6 +2,8 @@
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
+
+
 ?>
 
 <!-- Bootstrap Icons -->
@@ -9,16 +11,15 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
   <div class="container">
-    <a class="navbar-brand d-flex align-items-center" href="index.php">
-      <img src="images/logo.png" alt="Logo Aventones" height="70" class="me-2">
-      <span class="fw-bold fs-4" style="color: #198754;">Aventones CR</span>
-    </a>
-
-  
+    <a class="navbar-brand d-flex align-items-center" href="/index.php">
+      <img src="/images/logo.png" alt="Logo Aventones" height="70" class="me-2">
+      <span class="fw-bold fs-4" style="color: #e4e4e4ff;">Aventones CR</span>
+        
+    </a> 
 
       <?php if (!isset($_SESSION['user_id'])): ?>
         <!-- Usuario NO logueado -->
-        <a href="login.php" class="btn btn-outline-light">Iniciar sesión</a>
+        <a href="/login.php" class="btn btn-outline-light">Iniciar sesión</a>
 
       <?php else: ?>
         <!-- Usuario LOGUEADO -->
@@ -40,15 +41,22 @@ if (session_status() === PHP_SESSION_NONE) {
             <li><h6 class="dropdown-header">Mi cuenta</h6></li>
 
             <!-- Opciones comunes -->
-            <li><a class="dropdown-item" href="perfil.php"><i class="bi bi-person"></i> Mi perfil</a></li>
+            <li><a class="dropdown-item" href="/miPerfil.php"><i class="bi bi-person"></i> Mi perfil</a></li>
 
             <?php if ($rol === 'pasajero'): ?>
               <!-- Opciones solo para pasajeros -->
               <li><a class="dropdown-item" href="vehiculos.php"><i class="bi bi-car-front"></i> Quiero ser chofer</a></li>
               <li><a class="dropdown-item" href="mis_viajes.php"><i class="bi bi-calendar-check"></i> Mis viajes</a></li>
+
             <?php elseif ($rol === 'chofer'): ?>
               <!-- Opciones solo para chofer -->
               <li><a class="dropdown-item" href="dashboard_chofer.php"><i class="bi bi-speedometer2"></i> Panel de chofer</a></li>
+|            <li><a class="dropdown-item" href="mis_rides.php"><i class="bi bi-car-front-fill"></i> Mis rides</a></li>
+
+            <?php elseif ($rol === 'administrador'): ?>
+              <!-- Opciones solo para admin -->
+             <li><a class="dropdown-item" href="dashboard_admin.php"><i class="bi bi-speedometer2"></i> Panel de Admin</a></li>
+
             <?php endif; ?>
 
             <li><a class="dropdown-item" href="index.php"><i class="bi bi-house-door"></i> Inicio</a></li>

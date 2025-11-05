@@ -123,6 +123,7 @@ UPDATE Usuarios
 SET contrasena = SHA2(contrasena, 256)
 WHERE LOWER(nombreUsuario) = 'admin';
 
+
 NUEVOS PARA LA BD KRISTEL
 
 ALTER TABLE Vehiculos ADD COLUMN motivoRechazo VARCHAR(255) NULL AFTER estado;
