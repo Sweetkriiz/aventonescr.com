@@ -10,8 +10,8 @@ $destino = trim($data['destino'] ?? '');
 $fecha = trim($data['fecha'] ?? '');
 $pasajeros = intval($data['pasajeros'] ?? 1);
 
-// Si no hay datos, devolvemos error
-if (empty($origen) || empty($destino)) {
+// Validar datos y si no hay datos, devolvemos error
+if (empty($origen) || empty($destino) || empty($fecha)) {
     echo json_encode(["status" => "error", "message" => "Faltan datos"]);
     exit;
 }
@@ -19,23 +19,26 @@ if (empty($origen) || empty($destino)) {
 // Consulta a la base de datos
 $sql = "SELECT COUNT(*) AS total
         FROM Viajes
-        WHERE lugarSalida LIKE :origen 
+        WHERE origen LIKE :origen
           AND destino LIKE :destino
-          AND espaciosDisponibles >= :pasajeros";
+          AND fecha = :fecha
+          AND espaciosDisponibles >= :pasajeros
+          AND estado = 'activo'";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
   ':origen' => "%$origen%",
   ':destino' => "%$destino%",
+  ':fecha' => $fecha,
   ':pasajeros' => $pasajeros
 ]);
+
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Si hay viajes, devolvemos "ok"
+// Devolver resultado en JSON
 if ($result && $result['total'] > 0) {
     echo json_encode(["status" => "ok"]);
 } else {
-    // Si no hay viajes, devolvemos "no_results"
     echo json_encode(["status" => "no_results"]);
 }
 ?>

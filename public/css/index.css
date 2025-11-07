@@ -1,71 +1,87 @@
-body {
-  font-family: 'Poppins', sans-serif;
+/* =============================
+    PALETA PRINCIPAL (EDITABLE)
+============================= */
+:root {
+  --color-principal: #198754;
+  --color-secundario: #00b894;
+  --color-texto-navbar: #ffffff;
+  --color-fondo-navbar: #12291e;
+  --color-fondo-footer: #1a100b;
 }
 
+/* =============================
+   BASE GLOBAL
+============================= */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
 
-.navbar {
-  background-color: #fcf8f6 !important;  
-} 
+img {
+  max-width: 100%;
+  height: auto;
+}
 
+/* =============================
+   NAVBAR
+============================= */
+.navbar-unificado {
+  background-color: var(--color-fondo-navbar) !important;
+}
 
-.navbar-brand img {
+.navbar-unificado .navbar-brand span {
+  color: var(--color-texto-navbar);
+}
+
+.navbar-unificado .nav-link,
+.navbar-unificado .dropdown-item {
+  color: var(--color-texto-navbar) !important;
+  transition: color 0.3s ease;
+}
+
+.navbar-unificado .nav-link:hover,
+.navbar-unificado .dropdown-item:hover {
+  color: var(--color-secundario) !important;
+}
+
+.logo-navbar {
   height: 80px;
 }
 
-.navbar-brand span {
-  letter-spacing: 1px;
+@media (max-width: 768px) {
+  .logo-navbar {
+    height: 60px;
+  }
 }
 
-.btn-success {
- background: linear-gradient(90deg, #198754, #00b894);
-  border: none;
-}
-
-.btn-success:hover {
-  background: linear-gradient(90deg, #198754, #00b894);
-  border: none;
-}
-
+/* =============================
+   BOTONES
+============================= */
+.btn-principal,
+.btn,
+.btn-success,
 .btn-outline-light {
-  background: linear-gradient(90deg, #198754, #00b894);
-  border: none;
-} 
-
-.btn-outline-light:hover {
-  background: linear-gradient(90deg, #198754, #00b894);
-  border: none;
+  background: linear-gradient(90deg, var(--color-principal), var(--color-secundario));
   color: #fff !important;
+  border: none !important;
+  transition: all 0.3s ease;
 }
 
-/* Formulario translúcido */
+.btn-principal:hover,
+.btn:hover {
+  background: linear-gradient(90deg, var(--color-secundario), var(--color-principal));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* =============================
+   FORMULARIOS TRANSLÚCIDOS
+============================= */
 .form-glass {
-  background: rgba(255, 255, 255, 0.568);
-  backdrop-filter: blur(6px);
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  padding: 30px;
-}
-
-/* Footer */
-footer {
-  background-color: #1a100b;
-  color: #fff;
-}
-
-/* Imagen principal */
-img.w-100 {
-  height: 600px;
-  object-fit: cover;
-}
-
-/* Texto con sombra */
-.text-shadow {
-  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-}
-.form-glass {
-  background: rgba(255, 255, 255, 0.2); /* más transparente */
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(10px) saturate(150%);
-  -webkit-backdrop-filter: blur(10px) saturate(150%);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
@@ -74,10 +90,48 @@ img.w-100 {
 }
 
 .form-glass:hover {
-  background: rgba(255, 255, 255, 0.3); /* se ilumina un poco al pasar el mouse */
+  background: rgba(255, 255, 255, 0.3);
   transform: translateY(-3px);
 }
 
-.form-label {
-  font-weight: bold;
+/* =============================
+   FOOTER
+============================= */
+footer {
+  background-color: var(--color-fondo-footer);
+  color: #fff;
+  text-align: center;
+  padding: 15px 0;
+}
+
+/* =============================
+   IMAGEN PRINCIPAL (BANNER)
+============================= */
+.banner {
+  height: 600px;
+  object-fit: cover;
+}
+
+/* =============================
+   TEXTOS
+============================= */
+.text-shadow {
+  text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+}
+/* =============================
+   DROPDOWN DEL NAVBAR
+============================= */
+.navbar-unificado .dropdown-menu {
+  background-color: var(--color-fondo-navbar);
+  border: none;
+}
+
+.navbar-unificado .dropdown-item {
+  color: var(--color-texto-navbar) !important;
+}
+
+.navbar-unificado .dropdown-item:hover,
+.navbar-unificado .dropdown-item:focus {
+  background-color: var(--color-secundario);
+  color: #fff !important;
 }

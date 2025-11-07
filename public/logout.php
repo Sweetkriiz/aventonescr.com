@@ -1,10 +1,10 @@
 <?php
 session_start();
 
-// 🔹 Eliminar todas las variables de sesión
+// Eliminar todas las variables de sesión
 $_SESSION = [];
 
-// 🔹 Eliminar la cookie de sesión (por si existe)
+// Eliminar la cookie de sesión (por si existe)
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -13,10 +13,10 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// 🔹 Destruir la sesión completamente
+//  Destruir la sesión completamente
 session_destroy();
 
-// 🔹 Redirigir al login
+// Redirigir al login
 header("Location: login.php");
 exit();
 ?>
