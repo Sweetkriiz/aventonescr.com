@@ -12,8 +12,6 @@ body {
   height: auto;
   max-height: none;
   background: url('../images/banner2.png') center;
-   /* fondo de relleno si no ocupa todo */
-  
   justify-content: center;
   align-items: center;
   color: white;
