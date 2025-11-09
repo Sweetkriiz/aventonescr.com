@@ -3,7 +3,6 @@ session_start();
 require_once __DIR__ . '/../config/funciones_carro.php';
 
 
-
 include('includes/navbar.php');
 ?>
 
@@ -17,11 +16,9 @@ include('includes/navbar.php');
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/chofer.css">
 </head>
-<!-- Bootstrap JS y Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Opcional: tu JS general -->
-<script src="js/main.js"></script>
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <body style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa;">
 

@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
 
         <div class="col-md-6 form-side">
-            <img src="images/logo.jpeg" alt="Logo Aventones" class="logo-login">
+            <img src="images/logo.png" alt="Logo Aventones" class="logo-login">
             <h3 class="text-center mb-4">Iniciar sesión</h3>
 
             <?php if (!empty($error)): ?>

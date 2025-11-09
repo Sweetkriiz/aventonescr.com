@@ -14,14 +14,18 @@ $sql = "SELECT v.*, u.nombre AS chofer_nombre, ve.modelo, ve.marca, ve.color
         FROM Viajes v
         INNER JOIN Usuarios u ON v.idChofer = u.idUsuario
         INNER JOIN Vehiculos ve ON v.idVehiculo = ve.idVehiculo
-        WHERE v.lugarSalida LIKE :origen 
+        WHERE v.origen LIKE :origen
           AND v.destino LIKE :destino
-          AND v.espaciosDisponibles >= :pasajeros";
+          AND v.fecha = :fecha
+          AND v.espaciosDisponibles >= :pasajeros
+          AND v.estado = 'activo'
+        ORDER BY v.horaSalida ASC";
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute([
   ':origen' => "%$origen%",
   ':destino' => "%$destino%",
+  ':fecha' => $fecha,
   ':pasajeros' => $pasajeros
 ]);
 
@@ -54,8 +58,9 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <h5 class="card-title text-success fw-bold"><?= htmlspecialchars($viaje['nombreViaje']) ?></h5>
                 <p class="mb-1"><strong>Chofer:</strong> <?= htmlspecialchars($viaje['chofer_nombre']) ?></p>
                 <p class="mb-1"><strong>Vehículo:</strong> <?= htmlspecialchars($viaje['marca']) . " " . htmlspecialchars($viaje['modelo']) ?> (<?= htmlspecialchars($viaje['color']) ?>)</p>
-                <p class="mb-1"><strong>Salida:</strong> <?= htmlspecialchars($viaje['lugarSalida']) ?> - <?= htmlspecialchars($viaje['horaSalida']) ?></p>
+                <p class="mb-1"><strong>Origen:</strong> <?= htmlspecialchars($viaje['origen']) ?> - <?= htmlspecialchars($viaje['horaSalida']) ?></p>
                 <p class="mb-1"><strong>Destino:</strong> <?= htmlspecialchars($viaje['destino']) ?> - <?= htmlspecialchars($viaje['horaLlegada']) ?></p>
+                <p class="mb-1"><strong>Fecha:</strong> <?= htmlspecialchars($viaje['fecha']) ?></p>
                 <p class="mb-1"><strong>Tarifa:</strong> ₡<?= number_format($viaje['tarifa'], 2) ?></p>
                 <p><strong>Espacios disponibles:</strong> <?= htmlspecialchars($viaje['espaciosDisponibles']) ?></p>
 
@@ -64,10 +69,11 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                           data-id="<?= $viaje['idViaje'] ?>"
                           data-nombre="<?= htmlspecialchars($viaje['nombreViaje']) ?>"
                           data-chofer="<?= htmlspecialchars($viaje['chofer_nombre']) ?>"
-                          data-salida="<?= htmlspecialchars($viaje['lugarSalida']) ?>"
+                          data-origen="<?= htmlspecialchars($viaje['origen']) ?>"
                           data-hsalida="<?= htmlspecialchars($viaje['horaSalida']) ?>"
                           data-destino="<?= htmlspecialchars($viaje['destino']) ?>"
                           data-hllegada="<?= htmlspecialchars($viaje['horaLlegada']) ?>"
+                          data-fecha="<?= htmlspecialchars($viaje['fecha']) ?>"
                           data-tarifa="<?= htmlspecialchars($viaje['tarifa']) ?>"
                           data-espacios="<?= htmlspecialchars($viaje['espaciosDisponibles']) ?>">
                     Reservar cupo
@@ -102,8 +108,9 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-body">
           <p><strong>Viaje:</strong> <span id="res-nombre"></span></p>
           <p><strong>Chofer:</strong> <span id="res-chofer"></span></p>
-          <p><strong>Salida:</strong> <span id="res-salida"></span> - <span id="res-hsalida"></span></p>
+          <p><strong>Origen:</strong> <span id="res-origen"></span> - <span id="res-hsalida"></span></p>
           <p><strong>Destino:</strong> <span id="res-destino"></span> - <span id="res-hllegada"></span></p>
+          <p><strong>Fecha:</strong> <span id="res-fecha"></span></p>
           <p><strong>Tarifa:</strong> ₡<span id="res-tarifa"></span></p>
           <p><strong>Espacios disponibles:</strong> <span id="res-espacios"></span></p>
           <div id="mensaje-reserva" class="alert d-none mt-3"></div>
@@ -129,14 +136,15 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   document.querySelectorAll(".btn-reservar").forEach(btn => {
     btn.addEventListener("click", e => {
-      e.preventDefault(); // Evita abrir otra página
+      e.preventDefault();
       idViajeActual = btn.dataset.id;
       document.getElementById("res-nombre").textContent = btn.dataset.nombre;
       document.getElementById("res-chofer").textContent = btn.dataset.chofer;
-      document.getElementById("res-salida").textContent = btn.dataset.salida;
+      document.getElementById("res-origen").textContent = btn.dataset.origen;
       document.getElementById("res-hsalida").textContent = btn.dataset.hsalida;
       document.getElementById("res-destino").textContent = btn.dataset.destino;
       document.getElementById("res-hllegada").textContent = btn.dataset.hllegada;
+      document.getElementById("res-fecha").textContent = btn.dataset.fecha;
       document.getElementById("res-tarifa").textContent = btn.dataset.tarifa;
       document.getElementById("res-espacios").textContent = btn.dataset.espacios;
       const msg = document.getElementById("mensaje-reserva");
@@ -163,7 +171,7 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById("btn-confirmar").disabled = true;
         setTimeout(() => {
           modal.hide();
-          location.reload(); // recarga los cupos actualizados
+          location.reload();
         }, 1800);
       }
     })

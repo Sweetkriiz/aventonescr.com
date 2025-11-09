@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $idPasajero = $_SESSION['user_id'];
 
 $sql = "SELECT r.idReserva, r.estadoReserva, r.fechaSolicitud,
-               v.nombreViaje, v.lugarSalida, v.destino, v.horaSalida, v.horaLlegada, v.tarifa,
+               v.nombreViaje, v.origen, v.destino, v.horaSalida, v.horaLlegada, v.tarifa, v.fecha,
                u.nombre AS chofer_nombre
         FROM Reservas r
         INNER JOIN Viajes v ON r.idViaje = v.idViaje
@@ -40,8 +40,8 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     body { font-family: 'Poppins', sans-serif; background-color: #f9f9f9; }
     .estado-pendiente { color: #ffc107; font-weight: bold; }
     .estado-aceptada { color: #198754; font-weight: bold; }
-    .estado-rechazada { color: #dc3545; font-weight: bold; }
-    .estado-cancelada { color: #6c757d; font-weight: bold; }
+    .estado-rechazada { color: #ec710cff; font-weight: bold; }
+    .estado-cancelada { color: #eb0606ff; font-weight: bold; }
     .table thead th { background-color: #212529; color: white; }
     .btn-sm { padding: 5px 10px; }
   </style>
@@ -58,11 +58,11 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <table class="table table-hover align-middle">
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Nombre del Viaje</th>
                 <th>Chofer</th>
-                <th>Salida</th>
+                <th>Origen</th>
                 <th>Destino</th>
+                <th>Fecha</th>
                 <th>Tarifa</th>
                 <th>Estado</th>
                 <th>Acciones</th>
@@ -71,11 +71,11 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <tbody>
               <?php foreach ($reservas as $r): ?>
               <tr id="reserva-<?= $r['idReserva'] ?>">
-                <td><?= $r['idReserva'] ?></td>
                 <td><strong><?= htmlspecialchars($r['nombreViaje']) ?></strong></td>
                 <td><?= htmlspecialchars($r['chofer_nombre']) ?></td>
-                <td><?= htmlspecialchars($r['horaSalida']) ?></td>
-                <td><?= htmlspecialchars($r['horaLlegada']) ?></td>
+                <td><?= htmlspecialchars($r['origen']) ?></td>
+                <td><?= htmlspecialchars($r['destino']) ?></td>
+                <td><?= htmlspecialchars($r['fecha']) ?></td>
                 <td><span class="badge bg-success">₡<?= number_format($r['tarifa'], 2) ?></span></td>
                 <td>
                   <span class="estado-<?= strtolower($r['estadoReserva']) ?>" id="estado-<?= $r['idReserva'] ?>">

@@ -123,12 +123,8 @@ UPDATE Usuarios
 SET contrasena = SHA2(contrasena, 256)
 WHERE LOWER(nombreUsuario) = 'admin';
 
-
-NUEVOS PARA LA BD KRISTEL
-
 ALTER TABLE Vehiculos ADD COLUMN motivoRechazo VARCHAR(255) NULL AFTER estado;
 
-SI TIENE VIAJES ELIMINELOS
 DELETE FROM Viajes WHERE idViaje = 1
 
 ALTER TABLE Viajes
@@ -136,3 +132,7 @@ CHANGE COLUMN lugarSalida origen VARCHAR(255) NOT NULL,
 ADD COLUMN fecha DATE NOT NULL AFTER origen,
 DROP COLUMN diasSemana,
 ADD COLUMN estado ENUM('activo','completado','cancelado') DEFAULT 'activo';
+
+ALTER TABLE Usuarios
+MODIFY COLUMN rol ENUM('pasajero', 'chofer', 'administrador', 'pendiente_chofer')
+DEFAULT 'pasajero';

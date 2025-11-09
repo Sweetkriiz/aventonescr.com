@@ -92,4 +92,34 @@ function getVehiculosAprobados($idChofer) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+//  Esta es la versión usada cuando el pasajero quiere ser chofer
+function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $foto) {
+    global $pdo;
+    try {
+        // Insertar el vehículo en estado pendiente
+        $sql = "INSERT INTO Vehiculos (idChofer, marca, modelo, placa, color, fotografia, estado)
+                VALUES (:idChofer, :marca, :modelo, :placa, :color, :foto, 'pendiente')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            ':idChofer' => $idUsuario,
+            ':marca' => $marca,
+            ':modelo' => $modelo,
+            ':placa' => $placa,
+            ':color' => $color,
+            ':foto' => $foto
+        ]);
+
+        // Actualizar rol del usuario a "pendiente_chofer"
+        $update = $pdo->prepare("UPDATE Usuarios SET rol = 'pendiente_chofer' WHERE idUsuario = :id");
+        $update->execute([':id' => $idUsuario]);
+
+        return true;
+    } catch (PDOException $e) {
+        error_log("Error al registrar vehículo pasajero: " . $e->getMessage());
+        return false;
+    }
+}
+
 ?>
+
+

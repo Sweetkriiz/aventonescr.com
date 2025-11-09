@@ -19,14 +19,15 @@ include('includes/navbar.php');
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS personalizado -->
-  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="/css/index.css?v=5">
+
 </head>
 
 <body class="bg-light">
 
   <!-- Sección principal con imagen fija -->
   <section class="position-relative">
-    <img src="images/Banner1.jpg" alt="Aventones" class="w-100" style="height: 600px; object-fit: cover;">
+<img src="images/Banner1.jpg" alt="Aventones" class="banner w-100">
 
     <!-- FRASE EN LA ESQUINA DERECHA -->
     <div class="position-absolute text-end" style="top: 120px; right: 40px; z-index: 20;">
