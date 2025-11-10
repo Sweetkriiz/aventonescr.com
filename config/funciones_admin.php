@@ -7,11 +7,9 @@ require_once __DIR__ . '/database.php';
 // Función para obtener todos los usuarios
 function obtenerUsuarios() {
   global $pdo;
-  $stmt = $pdo->query("SELECT idUsuario, nombre, apellidos, correo, telefono, rol FROM Usuarios ORDER BY idUsuario DESC");
+  $stmt = $pdo->query("SELECT idUsuario,nombreUsuario, nombre, apellidos, cedula, fechaNacimiento, correo, telefono, rol, fechaRegistro FROM Usuarios ORDER BY idUsuario DESC");
   return $stmt->fetchAll(PDO::FETCH_ASSOC); 
 }
-
-
 
 //Función para verificar si el usuario está autenticado
 function checkAuth(){
@@ -39,7 +37,19 @@ function crearUsuario($nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsu
     return $pdo->lastInsertId();
 }
 
-//Función para eliminar un usuario
+// Eliminar usuario por ID
+function deleteUser($id) {
+    try {
+        $pdo = getConnection(); // o usa require_once '../config/database.php' si no tienes una función global
+        $stmt = $pdo->prepare("DELETE FROM Usuarios WHERE id = ?");
+        return $stmt->execute([$id]);
+    } catch (PDOException $e) {
+        // Manejo básico de errores (útil para debug)
+        error_log("Error al eliminar usuario: " . $e->getMessage());
+        return false;
+    }
+}
+
 
 
 ?>

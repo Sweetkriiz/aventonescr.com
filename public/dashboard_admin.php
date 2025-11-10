@@ -67,6 +67,7 @@ include('includes/navbar.php');
   © 2025 Aventones CR | Panel del Administración
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

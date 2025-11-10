@@ -20,12 +20,11 @@ function loginUsuario(string $usuario, string $contrasena): bool {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]);
 
-        // Buscar usuario por nombre de usuario
+      
         $stmt = $pdo->prepare("SELECT idUsuario, nombreUsuario, contrasena, rol FROM Usuarios WHERE nombreUsuario = ? LIMIT 1");
         $stmt->execute([$usuario]);
         $user_data = $stmt->fetch();
 
-        // Verificar si el usuario existe
         if (!$user_data) {
             $_SESSION["error"] = "Usuario no encontrado";
             return false;
@@ -130,8 +129,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ¿No tienes una cuenta?
                 <a href="registrarse.php" class="text-decoration-none">Regístrate</a>
             </p>
+            <p class="text-center mt-2">
+                ¿Olvidaste tu contraseña?
+                <a href="index.php" class="text-decoration-none">Recuperar tu contraseña</a> <!-- RECUPERAR LA CONTRASEÑA  -->
+            </p>
+
         </div>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
