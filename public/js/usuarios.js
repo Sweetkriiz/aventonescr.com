@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
   const modal = document.getElementById('verUsuarioModal');
 
@@ -42,3 +43,23 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
+// Función para recargar la tabla de usuarios cada 30 segundos
+document.addEventListener('DOMContentLoaded', function () {
+  const tablaUsuarios = document.getElementById('tablaUsuarios');
+
+  // Función que carga la tabla desde PHP
+  function cargarTabla() {
+    fetch('tabla_usuarios.php')
+      .then(response => response.text())
+      .then(html => {
+        tablaUsuarios.innerHTML = html;
+      })
+      .catch(error => console.error('Error al cargar usuarios:', error));
+  }
+
+  // Cargar al iniciar
+  cargarTabla();
+
+  // Recargar automáticamente cada 30 segundos
+  setInterval(cargarTabla, 30000); // 30000 ms = 30 segundos
+});
