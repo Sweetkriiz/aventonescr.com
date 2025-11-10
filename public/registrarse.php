@@ -1,5 +1,6 @@
 <?php
 require_once '../config/database.php';
+include("includes/navbar.php");
 
 $mensaje = "";
 $errores = [];
@@ -16,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telefono = trim($_POST['telefono']);
     $rol = 'pasajero'; // Valor por defecto
 
-    // --- VALIDACIONES BÁSICAS ---
     if (empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
         empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)) {
         $errores[] = "Todos los campos son obligatorios.";
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $hashedPassword, $telefono, $rol]);
 
-            $mensaje = true; // activará el modal
+            $mensaje = true; 
         } catch (PDOException $e) {
             $errores[] = "Error al registrar el usuario: " . $e->getMessage();
         }
@@ -83,16 +83,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-
-  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-    <div class="container-fluid px-4">
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <img src="images/logo.jpeg" alt="Logo Aventones" class="navbar-logo me-2" style="height: 45px; border-radius: 50%;">
-        <span class="fw-bold text-success">Aventones CR</span>
-      </a>
-      <button class="btn btn-success ms-auto">Publicar un viaje</button>
-    </div>
-  </nav>
 
   <?php if (!empty($errores)): ?>
   <div class="alert alert-danger mt-3">
@@ -204,7 +194,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
       modal.show();
 
-      // 🔁 Redirigir automáticamente al login después de 4 s
       setTimeout(() => {
         window.location.href = "login.php";
       }, 4000);
@@ -213,7 +202,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <?php endif; ?>
 
 
-  <!-- 🔹 Footer -->
   <footer class="footer bg-light border-top mt-5 py-4">
     <div class="container d-flex flex-wrap justify-content-between align-items-center">
       <div>
@@ -221,8 +209,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <ul class="list-unstyled mb-0">
           <li><a href="#" class="text-decoration-none text-muted">Inicio</a></li>
           <li><a href="#" class="text-decoration-none text-muted">Acerca de nosotros</a></li>
-          <li><a href="mailto:contacto@aventonescr.com" class="text-decoration-none text-muted">📧 contacto@aventonescr.com</a></li>
-          <li><a href="tel:+50688888888" class="text-decoration-none text-muted">📞 +506 8888-8888</a></li>
+          <li><a href="mailto:contacto@aventonescr.com" class="text-decoration-none text-muted">contacto@aventonescr.com</a></li>
+          <li><a href="tel:+50688888888" class="text-decoration-none text-muted">+506 8888-8888</a></li>
         </ul>
       </div>
       <div class="d-flex gap-3 fs-4">

@@ -9,7 +9,6 @@ body {
     font-family: 'Poppins', sans-serif;
 }
 
-/* Contenedor principal */
 .login-container {
     background-color: #fff;
     border-radius: 1rem;
@@ -21,7 +20,6 @@ body {
     flex-wrap: wrap;
 }
 
-/* Imagen lateral */
 .image-side {
     flex: 1;
     background-color: #f8f9fa;
@@ -68,6 +66,17 @@ body {
     background: linear-gradient(90deg, #00582f, #009e7a);
     transform: translateY(-1px);
 }
+
+
+footer.footer {
+  width: 100%;
+  text-align: center;
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  margin-top: 50px;
+  position: relative;
+}
+
 
 /* Responsive */
 @media (max-width: 768px) {

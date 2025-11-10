@@ -3,11 +3,6 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-.navbar-logo {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
 
 .register-container {
   background: #fff;
