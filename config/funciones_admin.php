@@ -50,6 +50,30 @@ function deleteUser($id) {
     }
 }
 
+// Actualizar usuario
+function updateUser($id, $nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $telefono, $rol) {
+    try {
+        $pdo = getConnection();
+        $stmt = $pdo->prepare("
+            UPDATE Usuarios 
+            SET 
+                nombre = ?, 
+                apellidos = ?, 
+                cedula = ?, 
+                fechaNacimiento = ?, 
+                nombreUsuario = ?, 
+                correo = ?, 
+                telefono = ?, 
+                rol = ?
+            WHERE idUsuario = ?
+        ");
+        return $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $telefono, $rol, $id]);
+    } catch (PDOException $e) {
+        error_log("Error al actualizar usuario: " . $e->getMessage());
+        return false;
+    }
+}
+
 
 
 ?>
