@@ -17,6 +17,10 @@ include('includes/navbar.php');
 
 </head>
 <body>
+
+   <!--  Banner -->
+  
+
   <div class="container py-5 text-center">
     <h1 class="fw-bold mb-2"><span>Panel de Administrador</h1> </span>
     <h4 class="text-muted mb-4">Bienvenido,

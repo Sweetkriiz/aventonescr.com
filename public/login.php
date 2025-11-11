@@ -1,98 +1,104 @@
 <?php
-require_once __DIR__ . '/../config/start_app.php';
-require_once __DIR__ . '/../config/database.php';
+    require_once __DIR__ . '/../config/start_app.php';
+    require_once __DIR__ . '/../config/database.php';
+    
+    // si el usuario ya inició sesión, redirigir según su rol
+    if (isset($_SESSION["usuario"]) && isset($_SESSION["rol"])) {
+        switch ($_SESSION["rol"]) {
+            case 'administrador':
+                header("Location: dashboard_admin.php");
+                exit();
+            case 'chofer':
+            case 'pasajero':
+                header("Location: index.php");
+                exit();
+        }
+    }
 
-// --- Lógica principal ---
-if (isset($_SESSION["usuario"])) {
-    header("Location: index.php");
-    exit();
-}
+    // procesar formulario de inicio de sesión
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $usuario = trim($_POST["nombreUsuario"] ?? '');
+        $contrasena = trim($_POST["password"] ?? '');
 
-// --- Función para manejar el login ---
-function loginUsuario(string $usuario, string $contrasena): bool {
-    global $host, $db, $user, $pass;
-
-    try {
-        // Crear conexión PDO
-        $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-        $pdo = new PDO($dsn, $user, $pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-
-      
-        $stmt = $pdo->prepare("SELECT idUsuario, nombreUsuario, contrasena, rol FROM Usuarios WHERE nombreUsuario = ? LIMIT 1");
-        $stmt->execute([$usuario]);
-        $user_data = $stmt->fetch();
-
-        if (!$user_data) {
-            $_SESSION["error"] = "Usuario no encontrado";
-            return false;
+        // valida que los campos no estén vacíos
+        if (empty($usuario) || empty($contrasena)) {
+            $_SESSION["error"] = "Por favor, complete todos los campos";
+            header("Location: login.php");
+            exit();
         }
 
-        // Verificar contraseña (usando SHA-256)
-        $password_hash = hash('sha256', $contrasena);
-        if ($password_hash !== $user_data['contrasena']) {
-            $_SESSION["error"] = "Usuario o contraseña incorrectos";
-            return false;
+        try {
+            // crear conexión PDO
+            $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+
+            // preparar y ejecutar la consulta del usuario
+            $stmt = $pdo->prepare("SELECT idUsuario, nombreUsuario, contrasena, rol 
+                                   FROM Usuarios 
+                                   WHERE nombreUsuario = ? 
+                                   LIMIT 1");
+            $stmt->execute([$usuario]);
+            $user_data = $stmt->fetch();
+
+            // verifica si el usuario existe
+            if ($user_data) {
+                // verifica la contraseña usando SHA-256
+                $password_hash = hash('sha256', $contrasena);
+
+                if ($password_hash === $user_data['contrasena']) {
+                    // login exitoso
+                    $_SESSION["usuario"] = $user_data['nombreUsuario'];
+                    $_SESSION["user_id"] = $user_data['idUsuario'];
+                    $_SESSION["rol"] = $user_data['rol'];
+
+                    // limpiar errores previos
+                    unset($_SESSION["error"]);
+
+                    // redirigir según el rol
+                    switch ($user_data['rol']) {
+                        case 'administrador':
+                            header("Location: dashboard_admin.php");
+                            exit();
+                        case 'chofer':
+                        case 'pasajero':
+                            header("Location: index.php");
+                            exit();
+                    }
+                } else {
+                    // contraseña incorrecta
+                    $_SESSION["error"] = "Usuario o contraseña incorrectos";
+                    header("Location: login.php");
+                    exit();
+                }
+            } else {
+                // usuario no encontrado
+                $_SESSION["error"] = "Usuario no encontrado";
+                header("Location: login.php");
+                exit();
+            }
+        } 
+        catch (PDOException $e) {
+            // manejo de errores de conexión
+            error_log("Error de base de datos en login: " . $e->getMessage());
+            $_SESSION["error"] = "Error del sistema. Intente más tarde.";
+            header("Location: login.php");
+            exit();
         }
-
-        // Inicio de sesión exitoso
-        $_SESSION["usuario"] = $user_data['nombreUsuario'];
-        $_SESSION["user_id"] = $user_data['idUsuario'];
-        $_SESSION["rol"] = $user_data['rol']; // guarda el rol del usuario
-        unset($_SESSION["error"]);
-        return true;
-
-    } catch (PDOException $e) {
-        error_log("Error de base de datos en login: " . $e->getMessage());
-        $_SESSION["error"] = "Error del sistema. Intente más tarde.";
-        return false;
-    }
-}
-
-
-// Mostrar error (si existe) y limpiarlo siempre
-$error = $_SESSION["error"] ?? "";
-unset($_SESSION["error"]);
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $usuario = trim($_POST["nombreUsuario"] ?? '');
-    $contrasena = trim($_POST["password"] ?? '');
-
-    if (empty($usuario) || empty($contrasena)) {
-        $_SESSION["error"] = "Por favor, complete todos los campos";
-        header("Location: login.php");
-        exit();
     }
 
-    if (loginUsuario($usuario, $contrasena)) {
-    // Redirigir según el rol
-    switch ($_SESSION["rol"]) {
-        case 'administrador':
-            header("Location: dashboard_admin.php");
-            break;
-
-        case 'chofer':
-            header("Location: index.php");
-            break;
-
-        case 'pasajero':
-            header("Location: index.php");
-            break;
-    }
-
-    exit();
-    }
-
-}
+    // mostrar mensaje de error si existe
+    $error = $_SESSION["error"] ?? "";
+    unset($_SESSION["error"]);
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar sesión - Aventones</title>
+    <title>Iniciar sesión - Aventones CR</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/login.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -113,30 +119,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <form method="POST" action="">
                 <div class="mb-3">
-                    <label for="nombreUsuario" class="form-label">Nombre de usuario</label>
+                    <label for="nombreUsuario" class="form-label fw-bold">Nombre de usuario</label>
                     <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-control" placeholder="Ingresa tu nombre de usuario" required>
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label">Contraseña</label>
+                    <label for="password" class="form-label fw-bold">Contraseña</label>
                     <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                <button type="submit" class="btn btn-primary w-100 fw-semibold">Entrar</button>
             </form>
 
             <p class="text-center mt-3 mb-0">
                 ¿No tienes una cuenta?
-                <a href="registrarse.php" class="text-decoration-none">Regístrate</a>
+                <a href="registrarse.php" class="text-decoration-none fw-semibold">Regístrate</a>
             </p>
             <p class="text-center mt-2">
                 ¿Olvidaste tu contraseña?
-                <a href="index.php" class="text-decoration-none">Recuperar tu contraseña</a> <!-- RECUPERAR LA CONTRASEÑA  -->
+                <a href="index.php" class="text-decoration-none fw-semibold">Recupérala aquí</a>
             </p>
-
         </div>
     </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

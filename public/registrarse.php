@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telefono = trim($_POST['telefono']);
     $rol = 'pasajero'; // Valor por defecto
 
+    // --- VALIDACIONES BÁSICAS ---
     if (empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
         empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)) {
         $errores[] = "Todos los campos son obligatorios.";
@@ -54,7 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // --- GUARDAR EN BD SI NO HAY ERRORES ---
     if (empty($errores)) {
         try {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            // Hashear con SHA-256 (igual que en el login)
+            $hashedPassword = hash('sha256', $password);
 
             $sql = "INSERT INTO Usuarios 
                     (nombre, apellidos, cedula, fechaNacimiento, nombreUsuario, correo, contrasena, telefono, rol)
@@ -161,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 
-  <<!-- Modal de éxito moderno -->
+<!-- Modal de éxito -->
 <div class="modal fade" id="registroExitoso" tabindex="-1" aria-labelledby="registroExitosoLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -193,12 +195,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     document.addEventListener("DOMContentLoaded", function () {
       const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
       modal.show();
-
+      const form = document.querySelector("form");
+      if (form) form.reset();
       setTimeout(() => {
         window.location.href = "login.php";
       }, 4000);
     });
   </script>
+  
 <?php endif; ?>
 
 
