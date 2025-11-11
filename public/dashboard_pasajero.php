@@ -148,9 +148,10 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
       <div class="card border-0 shadow-sm text-center p-4 bg-light">
         <h4 class="fw-bold text-success mb-2">¿Querés ser chofer?</h4>
         <p>Registrá tu primer vehículo y empezá a ofrecer viajes a otros usuarios.</p>
-        <a href="../public/registrar_vehiculo_pasajero.php" class="btn btn-success">
+        <a href="CRUD_vehiculos/car_create.php" class="btn btn-success">
           <i class="bi bi-car-front"></i> Registrar mi vehículo
         </a>
+
       </div>
 
     <!-- Estado pendiente de aprobación -->

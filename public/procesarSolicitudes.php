@@ -1,29 +1,101 @@
 <?php
-
 session_start();
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/funciones_admin.php';
+include('includes/navbar.php');
 
 
-// --- Consultar vehículos pendientes ---
-$stmt = $pdo->query("
-    SELECT 
-        v.idVehiculo AS id,
-        v.marca,
-        v.modelo,
-        v.anio,
-        v.color,
-        v.placa,
-        v.fotografia,
-        u.nombreUsuario,
-        CONCAT(u.nombre, ' ', u.apellidos) AS nombreCompleto
-    FROM vehiculos v
-    INNER JOIN usuarios u ON v.idChofer = u.idUsuario
-    WHERE v.estado = 'pendiente'
-    ORDER BY v.idVehiculo DESC
-");
-$vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// --- Procesar aprobación o rechazo ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $idVehiculo = $_POST['id'] ?? null;
+    $accion = $_POST['accion'] ?? null;
+
+    if ($accion === 'aprobar' && $idVehiculo) {
+        $stmt = $pdo->prepare("
+            UPDATE vehiculos 
+            SET estado = 'aprobado', 
+                motivoRechazo = NULL,
+                leido = 0
+            WHERE idVehiculo = ?
+        ");
+        $stmt->execute([$idVehiculo]);
+        $_SESSION['mensaje'] = "Vehículo aprobado correctamente.";
+        header("Location: procesarSolicitudes.php");
+        exit();
+
+    } elseif ($accion === 'rechazar' && $idVehiculo) {
+        $motivo = trim($_POST['motivo'] ?? '');
+        if (empty($motivo)) {
+            $_SESSION['error'] = 'Debe indicar el motivo de rechazo.';
+            header("Location: procesarSolicitudes.php");
+            exit();
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE vehiculos 
+            SET estado = 'rechazado', 
+                motivoRechazo = ?, 
+                leido = 0
+            WHERE idVehiculo = ?
+        ");
+        $stmt->execute([$motivo, $idVehiculo]);
+        $_SESSION['mensaje'] = "Vehículo rechazado correctamente.";
+        header("Location: procesarSolicitudes.php");
+        exit();
+    }
+}
+
+// --- Filtro de búsqueda ---
+$busqueda = $_GET['busqueda'] ?? null;
+
+// --- Consulta dinámica ---
+if (!empty($busqueda)) {
+    $stmt = $pdo->prepare("
+        SELECT 
+            v.idVehiculo AS id,
+            v.marca,
+            v.modelo,
+            v.anio,
+            v.color,
+            v.placa,
+            v.fotografia,
+            v.estado,
+            u.nombreUsuario,
+            CONCAT(u.nombre, ' ', u.apellidos) AS nombreCompleto
+        FROM vehiculos v
+        INNER JOIN usuarios u ON v.idChofer = u.idUsuario
+        WHERE 
+            u.nombreUsuario LIKE :busqueda 
+            OR u.nombre LIKE :busqueda 
+            OR u.apellidos LIKE :busqueda
+        ORDER BY v.idVehiculo DESC
+    ");
+    $stmt->bindValue(':busqueda', "%$busqueda%");
+    $stmt->execute();
+    $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    // Mostrar solo los pendientes si no hay búsqueda
+    $stmt = $pdo->query("
+        SELECT 
+            v.idVehiculo AS id,
+            v.marca,
+            v.modelo,
+            v.anio,
+            v.color,
+            v.placa,
+            v.fotografia,
+            v.estado,
+            u.nombreUsuario,
+            CONCAT(u.nombre, ' ', u.apellidos) AS nombreCompleto
+        FROM vehiculos v
+        INNER JOIN usuarios u ON v.idChofer = u.idUsuario
+        WHERE v.estado = 'pendiente'
+        ORDER BY v.idVehiculo DESC
+    ");
+    $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -33,146 +105,10 @@ $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <title>Aventones CR | Procesar Solicitudes</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-  
-  <style>
-    <style>
-  body {
-    background-color: #f8f9fa;
-    font-family: 'Poppins', sans-serif;
-    min-height: 100vh;
-  }
-
-  h2 {
-    color: #212529;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-    letter-spacing: 0.5px;
-  }
-
-  .container {
-    max-width: 1200px;
-  }
-
-  .card {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-  }
-
-  .card img {
-    border-radius: 1rem 1rem 0 0;
-    object-fit: cover;
-    height: 180px;
-    width: 100%;
-  }
-
-  .card-body {
-    background-color: #fff;
-    padding: 1.5rem;
-  }
-
-  .card-title {
-    font-weight: 600;
-    color: #212529;
-  }
-
-  .card-text {
-    color: #555;
-    font-size: 0.95rem;
-  }
-
-  .btn-aprobar {
-    background-color: #28a745;
-    border: none;
-    color: #fff;
-    font-weight: 500;
-    padding: 6px 16px;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-  }
-
-  .btn-aprobar:hover {
-    background-color: #218838;
-    box-shadow: 0 3px 8px rgba(40,167,69,0.3);
-  }
-
-  .btn-rechazar {
-    background-color: #dc3545;
-    border: none;
-    color: #fff;
-    font-weight: 500;
-    padding: 6px 16px;
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-  }
-
-  .btn-rechazar:hover {
-    background-color: #c82333;
-    box-shadow: 0 3px 8px rgba(220,53,69,0.3);
-  }
-
-  .modal-content {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-  }
-
-  .modal-header {
-    border-bottom: none;
-    background: linear-gradient(45deg, #dc3545, #b52a36);
-  }
-
-  .modal-title {
-    font-weight: 600;
-  }
-
-  textarea.form-control {
-    border-radius: 0.5rem;
-    resize: none;
-  }
-
-  .alert {
-    border-radius: 0.75rem;
-    font-weight: 500;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-
-  .alert-success {
-    background-color: #d1e7dd;
-    color: #0f5132;
-    border: none;
-  }
-
-  .alert-danger {
-    background-color: #f8d7da;
-    color: #842029;
-    border: none;
-  }
-
-  .alert-info {
-    background-color: #cff4fc;
-    color: #055160;
-    border: none;
-  }
-
-  @media (max-width: 768px) {
-    .card-body {
-      text-align: center;
-    }
-    .btn-aprobar, .btn-rechazar {
-      width: 100%;
-      margin-bottom: 8px;
-    }
-  }
-</style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/procesarSolicitudes.css">
 </head>
 <body>
-  <?php include('includes/navbar.php'); ?>
 
   <!-- Mensajes -->
   <div class="container mt-4">
@@ -194,11 +130,31 @@ $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
   <div class="container py-5">
-    <h2 class="text-center fw-bold mb-4">Solicitudes de Vehículos Pendientes</h2>
+    <h2 class="text-center fw-bold mb-4">Solicitudes de Vehículos</h2>
 
-    <?php if (empty($vehiculosPendientes)): ?>
-      <div class="alert alert-info text-center">No hay solicitudes pendientes por procesar.</div>
-    <?php else: ?>
+    <!-- Buscador -->
+    <div class="container mb-4">
+      <form method="GET" class="d-flex justify-content-center">
+        <input type="text" name="busqueda" class="form-control me-2" 
+               placeholder="Buscar por nombre o usuario..." 
+               style="max-width: 400px;" value="<?= htmlspecialchars($_GET['busqueda'] ?? '') ?>">
+        <button type="submit" class="btn btn-success">
+          <i class="bi bi-search"></i> Buscar
+        </button>
+        <a href="procesarSolicitudes.php" class="btn btn-secondary ms-2">
+          <i class="bi bi-arrow-clockwise"></i> Ver todos
+        </a>
+      </form>
+    </div>
+
+  <?php if (empty($vehiculosPendientes)): ?>
+  <?php if (!empty($busqueda)): ?>
+    <div class="alert alert-info text-center">No se encontraron vehículos para “<?= htmlspecialchars($busqueda) ?>”.</div>
+  <?php else: ?>
+    <div class="alert alert-info text-center">No hay solicitudes pendientes por procesar.</div>
+  <?php endif; ?>
+  <?php else: ?>
+
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php foreach ($vehiculosPendientes as $vehiculo): ?>
           <div class="col">
@@ -214,19 +170,31 @@ $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p class="card-text mb-1"><strong>Chofer:</strong> <?= htmlspecialchars($vehiculo['nombreCompleto']) ?></p>
                 <p class="card-text mb-1"><strong>Usuario:</strong> <?= htmlspecialchars($vehiculo['nombreUsuario']) ?></p>
                 <p class="card-text mb-1"><strong>Placa:</strong> <?= htmlspecialchars($vehiculo['placa']) ?></p>
-                <p class="card-text mb-3"><strong>Año:</strong> <?= htmlspecialchars($vehiculo['anio']) ?></p>
+                <p class="card-text mb-1"><strong>Año:</strong> <?= htmlspecialchars($vehiculo['anio']) ?></p>
+
+                <!-- Badge de estado -->
+                <p class="card-text mb-2">
+                  <strong>Estado:</strong> 
+                  <span class="badge 
+                    <?= $vehiculo['estado'] === 'aprobado' ? 'bg-success' : 
+                        ($vehiculo['estado'] === 'rechazado' ? 'bg-danger' : 'bg-warning text-dark') ?>">
+                    <?= ucfirst($vehiculo['estado']) ?>
+                  </span>
+                </p>
 
                 <!-- Formulario de aprobación -->
                 <form method="POST" class="d-inline">
                   <input type="hidden" name="id" value="<?= $vehiculo['id'] ?>">
-                  <button type="submit" name="accion" value="aprobar" class="btn btn-aprobar btn-sm">
+                  <button type="submit" name="accion" value="aprobar" class="btn btn-aprobar btn-sm"
+                    <?= $vehiculo['estado'] !== 'pendiente' ? 'disabled' : '' ?>>
                     <i class="bi bi-check-circle"></i> Aprobar
                   </button>
                 </form>
 
                 <!-- Botón para modal de rechazo -->
                 <button type="button" class="btn btn-rechazar btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalRechazo" data-id="<?= $vehiculo['id'] ?>">
+                        data-bs-target="#modalRechazo" data-id="<?= $vehiculo['id'] ?>"
+                        <?= $vehiculo['estado'] !== 'pendiente' ? 'disabled' : '' ?>>
                   <i class="bi bi-x-circle"></i> Rechazar
                 </button>
               </div>
@@ -259,6 +227,10 @@ $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </form>
     </div>
   </div>
+
+  <footer class="text-center py-3 bg-dark text-white mt-5">
+    © 2025 Aventones CR | Panel del Administrador
+  </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>

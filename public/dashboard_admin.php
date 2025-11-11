@@ -53,14 +53,14 @@ include('includes/navbar.php');
         </div>
       </div>
 
-      <!-- Viajes -->
+      <!-- Reportes -->
       <div class="col-md-3">
         <div class="card p-4">
           <div class="text-primary mb-3">
             <i class="bi bi-map-fill fs-1"></i>
           </div>
-          <h5 class="fw-bold">Viajes</h5>
-          <p>Consulta todos los viajes publicados por los choferes.</p>
+          <h5 class="fw-bold">Reportes</h5>
+          <p>Gestiona reportes de viajes registrados en el sistema.</p>
           <a href="listar_ride.php" class="btn btn-primary btn-custom w-100">Ver Viajes</a>
         </div>
       </div>

@@ -4,30 +4,46 @@ include('includes/navbar.php');
 
 require_once '../config/database.php';
 
+// Obtener datos del usuario
+$idUsuario = $_SESSION['user_id'];
+$stmt = $pdo->prepare("SELECT * FROM usuarios WHERE idUsuario = ?");
+$stmt->execute([$idUsuario]);
+$usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// --- SUBIR FOTO ---
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['fotografia'])) {
+    $foto = $_FILES['fotografia'];
 
-if (!isset($_SESSION['usuario'])) {
-  header("Location: login.php");
-  exit();
+    if (!empty($foto['name']) && $foto['error'] === UPLOAD_ERR_OK) {
+        $extension = strtolower(pathinfo($foto['name'], PATHINFO_EXTENSION));
+        $permitidas = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array($extension, $permitidas)) {
+            $nombre = uniqid('perfil_') . '.' . $extension;
+            $directorio = "uploads/perfiles/"; // dentro del proyecto
+            $destino = $directorio . $nombre;
+
+            if (!is_dir($directorio)) {
+                mkdir($directorio, 0755, true);
+            }
+
+            // Eliminar la anterior si existe
+            if (!empty($usuario['fotografia']) && file_exists($directorio . $usuario['fotografia'])) {
+                unlink($directorio . $usuario['fotografia']);
+            }
+
+            if (move_uploaded_file($foto['tmp_name'], $destino)) {
+                $stmt = $pdo->prepare("UPDATE usuarios SET fotografia = ? WHERE idUsuario = ?");
+                $stmt->execute([$nombre, $idUsuario]);
+                header("Location: miPerfil.php");
+                exit;
+            }
+        }
+    }
 }
-$nombreUsuario = $_SESSION['usuario'];
 
-try {
-  $stmt = $pdo->prepare("SELECT * FROM Usuarios WHERE nombreUsuario = ?");
-  $stmt->execute([$nombreUsuario]);
-  $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-  if (!$usuario) {
-    $_SESSION['error'] = 'No se encontró el perfil del usuario.';
-    header("Location: index.php");
-    exit();
-  }
-} catch (PDOException $e) {
-  die("Error al obtener el perfil: " . $e->getMessage());
-}
 ?>
-
- 
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -37,57 +53,32 @@ try {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Poppins', sans-serif;
-    }
-    .card {
-      border: none;
-      border-radius: 1rem;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .profile-header {
-      background-color: #198754;
-      color: white;
-      border-radius: 1rem 1rem 0 0;
-      padding: 2rem;
-      text-align: center;
-    }
-    .profile-header i {
-      font-size: 4rem;
-    }
-    .profile-header h3 {
-      margin-top: 1rem;
-      font-weight: 700;
-    }
-    .profile-body {
-      padding: 2rem;
-    }
-    .info-label {
-      font-weight: 600;
-      color: #198754;
-    }
-    .btn-success {
-      background-color: #198754;
-      border: none;
-    }
-    .btn-success:hover {
-      background-color: #157347;
-    }
-  </style>
+  <link rel="stylesheet" href="../css/miPerfil.css">
 </head>
+
 
 <body>
   <div class="container py-5">
     <div class="card mx-auto" style="max-width: 850px;">
       
       <div class="profile-header">
-        <i class="bi bi-person-circle"></i>
-        <h3><?= htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']) ?></h3>
-        <span class="badge bg-light text-success fw-semibold"><?= ucfirst($usuario['rol']) ?></span>
-      </div>
+  <form id="formFoto" enctype="multipart/form-data" method="POST">
+    <label for="fotoPerfil" class="foto-perfil">
+      <img id="previewFoto"
+     src="<?= !empty($usuario['fotografia']) 
+              ? 'public/uploads/perfiles/' . htmlspecialchars($usuario['fotografia']) 
+              : 'images/avatar_default.png' ?>"
+     alt="Foto de perfil">
 
+
+      <div class="overlay"><i class="bi bi-camera"></i></div>
+    </label>
+    <input type="file" id="fotoPerfil" name="fotografia" accept="image/*" hidden>
+  </form>
+
+  <h3><?= htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']) ?></h3>
+  <span class="badge bg-light text-success fw-semibold"><?= ucfirst($usuario['rol']) ?></span>
+</div>
       <div class="profile-body">
         <div class="row mb-3">
           <div class="col-md-6">
@@ -124,14 +115,13 @@ try {
 
         <div class="mt-4 text-center">
           <a href="dashboard_<?= strtolower($usuario['rol']) ?>.php" class="btn btn-success px-4 me-2">
-            <i class="bi bi-arrow-left-circle"></i> Volver al Panel
+            <i class="bi bi-arrow-left-circle"></i> Volver a inicio
           </a>
-          <a href="CRUD_admin/user_edit.php?id=<?= $usuario['idUsuario'] ?>" class="btn btn-outline-success px-4">
+          <a href="edit_miperfil.php?id=<?= $usuario['idUsuario'] ?>" class="btn btn-outline-success px-4">
             <i class="bi bi-pencil-square"></i> Editar Perfil
           </a>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -140,5 +130,20 @@ try {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const inputFoto = document.getElementById("fotografia");
+    const preview = document.getElementById("previewFoto");
+    const formFoto = document.getElementById("formFoto");
+
+    inputFoto.addEventListener("change", function() {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => preview.src = e.target.result;
+        reader.readAsDataURL(file);
+        formFoto.submit(); // envía automáticamente
+      }
+    });
+  </script>
 </body>
 </html>

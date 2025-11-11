@@ -4,7 +4,34 @@ require_once __DIR__ . '/../config/funciones_carro.php';
 
 
 include('includes/navbar.php');
+
+$idUsuario = $_SESSION['user_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leido_id'])) {
+    $vehiculoId = $_POST['leido_id'];
+
+    $stmt = $pdo->prepare("UPDATE vehiculos SET leido = 1 WHERE idVehiculo = ?");
+    $stmt->execute([$vehiculoId]);
+
+    // Recargar página para actualizar vista
+    header("Location: dashboard_chofer.php");
+    exit();
+}
+
+// --- Obtener vehículos aprobados o rechazados sin leer ---
+$stmt = $pdo->prepare("
+    SELECT idVehiculo, marca, modelo, estado, motivoRechazo
+    FROM vehiculos
+    WHERE idChofer = ? 
+      AND estado IN ('aprobado', 'rechazado')
+      AND leido = 0
+");
+$stmt->execute([$idUsuario]); // <--- AQUÍ el cambio
+$vehiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
@@ -72,6 +99,39 @@ include('includes/navbar.php');
     </div>
   </div>
 
+<!-- Mensajes de estado de vehículos -->
+  <?php if ($vehiculos && count($vehiculos) > 0): ?>
+  <?php foreach ($vehiculos as $v): ?>
+    <?php
+      $color = $v['estado'] === 'aprobado' ? 'success' : 'danger';
+      $icon  = $v['estado'] === 'aprobado' ? 'check-circle-fill' : 'x-circle-fill';
+    ?>
+    <div class="alert alert-<?= $color ?> text-center mx-auto fw-semibold fade show" 
+         style="max-width:800px;" role="alert">
+      <i class="bi bi-<?= $icon ?>"></i>
+      <?php if ($v['estado'] === 'aprobado'): ?>
+        Tu vehículo <strong><?= htmlspecialchars($v['marca'].' '.$v['modelo']) ?></strong>
+        fue aprobado. ¡Ya podés ofrecer viajes!
+      <?php else: ?>
+        Tu vehículo <strong><?= htmlspecialchars($v['marca'].' '.$v['modelo']) ?></strong>
+        fue rechazado.<br>
+        <strong>Motivo:</strong> <?= htmlspecialchars($v['motivoRechazo']) ?>
+      <?php endif; ?>
+
+      <!-- Botón para marcar como leído -->
+      <form method="POST" class="d-inline ms-3">
+        <input type="hidden" name="leido_id" value="<?= $v['idVehiculo'] ?>">
+        <button type="submit" class="btn btn-sm btn-outline-dark">
+          <i class="bi bi-check2-circle"></i> Leído
+        </button>
+      </form>
+    </div>
+  <?php endforeach; ?>
+<?php endif; ?>
+
+
+
+
   <!-- Sección informativa -->
   <div class="card border-0 shadow-lg rounded-4 mt-5 consejos">
     <div class="card-body p-4">
@@ -91,6 +151,18 @@ include('includes/navbar.php');
 <footer class="text-center py-3 bg-dark text-white mt-5">
   © 2025 Aventones CR | Panel del Chofer
 </footer>
+
+<script>
+  // Espera 5 segundos y oculta todas las alertas
+  setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(alert => {
+      alert.classList.remove('show');
+      alert.classList.add('fade');
+      setTimeout(() => alert.remove(), 600); // remueve del DOM
+    });
+  }, 5000);
+</script>
+
 
 </body>
 </html>
