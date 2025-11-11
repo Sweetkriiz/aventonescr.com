@@ -15,6 +15,31 @@ h4.text-success {
   color: #198754 !important;
 }
 
+
+.banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1;
+}
+
+.banner-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 20px;
+}
+
+.banner-content h2 {
+  font-weight: 700;
+  font-size: 2.3rem;
+}
+
+.banner-content p {
+  font-size: 1.1rem;
+  margin-top: 8px;
+}
+
 /* ======== NAV TABS (pestañas superiores) ======== */
 .nav-tabs {
   border-bottom: 2px solid #198754;

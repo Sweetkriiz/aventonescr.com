@@ -1,5 +1,8 @@
 <?php
 session_start();
+
+require_once __DIR__ . '/../config/database.php';
+
 include('includes/navbar.php');
 ?>
 
@@ -63,6 +66,45 @@ include('includes/navbar.php');
     </div>
   </section>
 
+   <?php
+  // --- Mostrar los últimos viajes publicados ---
+  
+  // Recupera los tres viajes más recientes activos desde la base de datos
+  $ultimosViajes = $pdo->query("
+      SELECT nombreViaje, origen, destino, fecha, tarifa 
+      FROM Viajes 
+      WHERE estado='activo' 
+      ORDER BY fecha DESC 
+      LIMIT 3
+  ")->fetchAll(PDO::FETCH_ASSOC);
+
+  // Si hay resultados, los muestra en tarjetas (cards)
+  if ($ultimosViajes):
+  ?>
+  <section class="container my-5">
+    <h3 class="fw-bold text-dark text-center mb-4"> Últimos viajes publicados</h3>
+    <div class="row justify-content-center">
+      <?php foreach ($ultimosViajes as $v): ?>
+        <div class="col-md-3">
+          <div class="card border-0 shadow-sm mb-3">
+            <div class="card-body text-center">
+              <h5 class="fw-bold text-success"><?= htmlspecialchars($v['nombreViaje']) ?></h5>
+              <p class="mb-0"><?= htmlspecialchars($v['origen']) ?> → <?= htmlspecialchars($v['destino']) ?></p>
+              <small><?= htmlspecialchars($v['fecha']) ?></small>
+              <p class="fw-bold mt-2">₡<?= number_format($v['tarifa'], 2) ?></p>
+              <a href="resultados.php?origen=<?= urlencode($v['origen']) ?>&destino=<?= urlencode($v['destino']) ?>&fecha=<?= urlencode($v['fecha']) ?>&pasajeros=1" 
+                class="btn btn-outline-success btn-sm mt-2 w-100">
+                Ver detalles
+              </a>
+
+            </div>
+          </div>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  </section>
+  <?php endif; ?>
+
   <!-- SECCIÓN 3 PASOS -->
   <section class="container text-center my-5">
     <h2 class="fw-bold mb-4">Reserva tu cupo en 3 pasos</h2>
@@ -85,7 +127,7 @@ include('includes/navbar.php');
     </div>
   </section>
 
-  <!-- script JAVASCRIP -->
+  <!-- Script que maneja la búsqueda de viajes -->
    <script>
   
   // Maneja el envío del formulario de búsqueda

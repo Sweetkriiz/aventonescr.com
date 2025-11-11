@@ -29,7 +29,6 @@ $stmt->execute([
   ':pasajeros' => $pasajeros
 ]);
 
-// Resultados obtenidos
 $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -40,9 +39,22 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resultados de búsqueda - Aventones CR</title>
 
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/index.css">
+
+  <style>
+    /* Pequeñas mejoras visuales */
+    .hover-shadow:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .card {
+      border-radius: 15px;
+    }
+  </style>
 </head>
 
 <body style="font-family: 'Poppins', sans-serif; background-color: #f9f9f9;">
@@ -50,26 +62,34 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <div class="container my-5">
     <h2 class="text-center mb-4 fw-bold" style="color:#285936;">Resultados de tu búsqueda</h2>
 
+    <!-- Resumen de búsqueda -->
+    <div class="alert alert-light border-start border-success border-3 shadow-sm mb-4 text-center">
+      <strong>Ruta buscada:</strong> <?= htmlspecialchars($origen) ?> → <?= htmlspecialchars($destino) ?> |
+      <strong>Fecha:</strong> <?= htmlspecialchars($fecha) ?> |
+      <strong>Pasajeros:</strong> <?= htmlspecialchars($pasajeros) ?>
+    </div>
+
     <?php if (count($viajes) > 0): ?>
-      <div class="row g-4">
+      <div class="row g-4 justify-content-center">
         <?php foreach ($viajes as $viaje): ?>
-          <!-- Información básica del viaje -->
           <div class="col-md-6 col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
+            <div class="card border-0 shadow-sm h-100 rounded-4 hover-shadow">
               <div class="card-body">
-                <h5 class="card-title text-success fw-bold"><?= htmlspecialchars($viaje['nombreViaje']) ?></h5>
+                <h5 class="fw-bold text-dark mb-3">
+                  <?= htmlspecialchars($viaje['nombreViaje']) ?> 
+                  <span class="text-success">- <?= htmlspecialchars($viaje['fecha']) ?></span>
+                </h5>
                 <p class="mb-1"><strong>Chofer:</strong> <?= htmlspecialchars($viaje['chofer_nombre']) ?></p>
-                <p class="mb-1"><strong>Vehículo:</strong> <?= htmlspecialchars($viaje['marca']) . " " . htmlspecialchars($viaje['modelo']) ?> (<?= htmlspecialchars($viaje['color']) ?>)</p>
+                <p class="mb-1"><strong>Vehículo:</strong> <?= htmlspecialchars($viaje['marca']) ?> <?= htmlspecialchars($viaje['modelo']) ?> (<?= htmlspecialchars($viaje['color']) ?>)</p>
                 <p class="mb-1"><strong>Origen:</strong> <?= htmlspecialchars($viaje['origen']) ?> - <?= htmlspecialchars($viaje['horaSalida']) ?></p>
                 <p class="mb-1"><strong>Destino:</strong> <?= htmlspecialchars($viaje['destino']) ?> - <?= htmlspecialchars($viaje['horaLlegada']) ?></p>
-                <p class="mb-1"><strong>Fecha:</strong> <?= htmlspecialchars($viaje['fecha']) ?></p>
-                <p class="mb-1"><strong>Tarifa:</strong> ₡<?= number_format($viaje['tarifa'], 2) ?></p>
-                <p><strong>Espacios disponibles:</strong> <?= htmlspecialchars($viaje['espaciosDisponibles']) ?></p>
-                
+                <p class="mb-1"><strong>Tarifa:</strong> <span class="badge bg-success">₡<?= number_format($viaje['tarifa'], 2) ?></span></p>
+                <p class="mb-3"><strong>Espacios disponibles:</strong> <?= htmlspecialchars($viaje['espaciosDisponibles']) ?></p>
+
                 <!-- Botón de acción -->
                 <?php if (isset($_SESSION['user_id'])): ?>
-                  <button type="button" class="btn btn-success w-100 btn-reservar"
-                          data-id="<?= $viaje['idViaje'] ?>"
+                  <button class="btn btn-success w-100 btn-reservar" 
+                          data-id="<?= $viaje['idViaje'] ?>" 
                           data-nombre="<?= htmlspecialchars($viaje['nombreViaje']) ?>"
                           data-chofer="<?= htmlspecialchars($viaje['chofer_nombre']) ?>"
                           data-origen="<?= htmlspecialchars($viaje['origen']) ?>"
@@ -89,14 +109,14 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
         <?php endforeach; ?>
       </div>
-      
-     <!-- Si no hay viajes -->
     <?php else: ?>
+      <!-- Si no hay viajes -->
       <div class="alert alert-warning text-center mt-5 shadow-sm">
-        <strong>No hay viajes disponibles</strong> que coincidan con tu búsqueda.
+        <strong>No hay viajes disponibles</strong> que coincidan con tu búsqueda.<br>
+        <a href="index.php" class="btn btn-success mt-3 px-4">Intentar otra búsqueda</a>
       </div>
     <?php endif; ?>
-     <!-- Botón para volver -->
+
     <div class="text-center mt-4">
       <a href="index.php" class="btn btn-secondary px-4">Volver al inicio</a>
     </div>
@@ -110,7 +130,6 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <h5 class="modal-title fw-bold">Confirmar reserva</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-         <!-- Detalles del viaje -->
         <div class="modal-body">
           <p><strong>Viaje:</strong> <span id="res-nombre"></span></p>
           <p><strong>Chofer:</strong> <span id="res-chofer"></span></p>
@@ -136,58 +155,5 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-  const modalEl = document.getElementById("modalReserva");
-  const modal = new bootstrap.Modal(modalEl);
-  let idViajeActual = null;
-
-  document.querySelectorAll(".btn-reservar").forEach(btn => {
-    btn.addEventListener("click", e => {
-      e.preventDefault();
-      idViajeActual = btn.dataset.id;
-      document.getElementById("res-nombre").textContent = btn.dataset.nombre;
-      document.getElementById("res-chofer").textContent = btn.dataset.chofer;
-      document.getElementById("res-origen").textContent = btn.dataset.origen;
-      document.getElementById("res-hsalida").textContent = btn.dataset.hsalida;
-      document.getElementById("res-destino").textContent = btn.dataset.destino;
-      document.getElementById("res-hllegada").textContent = btn.dataset.hllegada;
-      document.getElementById("res-fecha").textContent = btn.dataset.fecha;
-      document.getElementById("res-tarifa").textContent = btn.dataset.tarifa;
-      document.getElementById("res-espacios").textContent = btn.dataset.espacios;
-      const msg = document.getElementById("mensaje-reserva");
-      msg.className = "alert d-none mt-3";
-      document.getElementById("btn-confirmar").disabled = false;
-      modal.show();
-    });
-  });
-
-  document.getElementById("btn-confirmar").addEventListener("click", () => {
-    fetch("reservar.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: "idViaje=" + encodeURIComponent(idViajeActual)
-    })
-    .then(r => r.json())
-    .then(data => {
-      const msg = document.getElementById("mensaje-reserva");
-      msg.classList.remove("d-none", "alert-success", "alert-danger");
-      msg.classList.add(data.status === "ok" ? "alert-success" : "alert-danger");
-      msg.textContent = data.mensaje;
-
-      if (data.status === "ok") {
-        document.getElementById("btn-confirmar").disabled = true;
-        setTimeout(() => {
-          modal.hide();
-          location.reload();
-        }, 1800);
-      }
-    })
-    .catch(() => {
-      const msg = document.getElementById("mensaje-reserva");
-      msg.classList.remove("d-none");
-      msg.classList.add("alert-danger");
-      msg.textContent = "Error al conectar con el servidor.";
-    });
-  });
-  </script>
-</body>
-</html>
+    const modalEl = document.getElementById("modalReserva");
+    const modal =
