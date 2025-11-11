@@ -186,8 +186,107 @@ h4.text-success {
   font-size: 0.95rem;
 }
 
-/* ======== ALERTAS ======== */
-.alert {
-  border-radius: 10px;
-  font-weight: 500;
-}
+  /* === ALERTAS (notificaciones de aprobación/rechazo) === */
+  .alert {
+    position: relative;
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    padding: 1.3rem 2rem;
+    margin: 1.2rem auto;
+    max-width: 850px;
+    transition: all 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .alert i {
+    font-size: 1.3rem;
+    margin-right: 8px;
+  }
+
+  .alert strong {
+    font-weight: 600;
+  }
+
+  /* --- Colores personalizados --- */
+  .alert-success {
+    background: linear-gradient(135deg, #198754, #2ecc71);
+    color: #fff;
+  }
+
+  .alert-danger {
+    background: linear-gradient(135deg, #dc3545, #ff6b6b);
+    color: #fff;
+  }
+
+  .alert-warning {
+    background: linear-gradient(135deg, #ffc107, #ffce3a);
+    color: #212529;
+  }
+
+  /* --- Animación de aparición --- */
+  .alert.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .alert.fade {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  /* === BOTÓN LEÍDO === */
+  .alert form {
+    margin: 0;
+  }
+
+  .alert .btn-outline-dark {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    color: #fff;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    padding: 6px 14px;
+    background: rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(4px);
+    transition: all 0.25s ease-in-out;
+  }
+
+  .alert .btn-outline-dark:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  /* --- Botón de cierre Bootstrap (por si lo usas) --- */
+  .alert .btn-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    filter: invert(1);
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+
+  .alert .btn-close:hover {
+    opacity: 1;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 768px) {
+    .alert {
+      flex-direction: column;
+      text-align: center;
+      padding: 1.2rem;
+    }
+
+    .alert .btn-outline-dark {
+      width: 100%;
+      margin-top: 0.8rem;
+    }
+  }
+
+

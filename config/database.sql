@@ -136,3 +136,8 @@ ADD COLUMN estado ENUM('activo','completado','cancelado') DEFAULT 'activo';
 ALTER TABLE Usuarios
 MODIFY COLUMN rol ENUM('pasajero', 'chofer', 'administrador', 'pendiente_chofer')
 DEFAULT 'pasajero';
+
+
+-- Modificación 
+ALTER TABLE vehiculos
+ADD COLUMN leido TINYINT(1) NOT NULL DEFAULT 0 AFTER motivoRechazo;

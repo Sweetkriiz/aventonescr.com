@@ -206,9 +206,8 @@ $usuarios = obtenerUsuarios();
       </div>
     </div>
   </div>
-
-  <footer class="text-center py-3 text-white mt-5">
-    © 2025 Aventones CR | Administración de Usuarios
+  <footer class="text-center py-3 bg-dark text-white mt-5">
+  © 2025 Aventones CR | Usuarios
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
