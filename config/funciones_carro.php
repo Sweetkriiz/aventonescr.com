@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/database.php'; 
 
+define('UPLOADS_PATH', '/aventones/uploads');
+
+
 // Obtener todos los vehículos de un chofer
 function getVehiculosByChofer($idChofer) {
     global $pdo;
@@ -92,7 +95,7 @@ function getVehiculosAprobados($idChofer) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-//  Esta es la versión usada cuando el pasajero quiere ser chofer
+//  Esto es cuando el pasajero quiere ser chofer
 function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $foto) {
     global $pdo;
     try {
@@ -109,9 +112,16 @@ function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $fo
             ':foto' => $foto
         ]);
 
-        // Actualizar rol del usuario a "pendiente_chofer"
-        $update = $pdo->prepare("UPDATE Usuarios SET rol = 'pendiente_chofer' WHERE idUsuario = :id");
-        $update->execute([':id' => $idUsuario]);
+        // Obtener rol actual del usuario
+        $rolStmt = $pdo->prepare("SELECT rol FROM Usuarios WHERE idUsuario = :id");
+        $rolStmt->execute([':id' => $idUsuario]);
+        $rolActual = strtolower($rolStmt->fetchColumn());
+
+        // Solo cambiar rol si NO es administrador
+        if ($rolActual !== 'administrador') {
+            $update = $pdo->prepare("UPDATE Usuarios SET rol = 'pendiente_chofer' WHERE idUsuario = :id");
+            $update->execute([':id' => $idUsuario]);
+        }
 
         return true;
     } catch (PDOException $e) {
@@ -119,6 +129,7 @@ function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $fo
         return false;
     }
 }
+
 
 ?>
 
