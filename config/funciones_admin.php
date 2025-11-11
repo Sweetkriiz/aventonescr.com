@@ -74,6 +74,90 @@ function updateUser($id, $nombre, $apellidos, $cedula, $fechaNacimiento, $nombre
     }
 }
 
+function verificarAdmin() {
+    session_start();
+    if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== 'administrador') {
+        header('Location: login.php');
+        exit();
+    }
+}
+
+/**
+ *  APROBACIÓN/RECHAZO DE VEHÍCULOS
+ */
+
+/**
+ * Obtiene el ID del usuario propietario de un vehículo.
+ */
+function obtenerUsuarioPorVehiculo(PDO $pdo, int $vehiculoId): ?int {
+    $stmt = $pdo->prepare("SELECT usuario_id FROM vehiculos WHERE id = ?");
+    $stmt->execute([$vehiculoId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? (int)$row['usuario_id'] : null;
+}
+
+/**
+ * Aprueba un vehículo y, si es el primero aprobado, cambia el rol del usuario a 'chofer'.
+ */
+function aprobarVehiculo(PDO $pdo, int $vehiculoId): void {
+    // Aprobar el vehículo
+    $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'aprobado', motivo_rechazo = NULL WHERE id = ?");
+    $stmt->execute([$vehiculoId]);
+
+    // Obtener el ID del usuario
+    $usuarioId = obtenerUsuarioPorVehiculo($pdo, $vehiculoId);
+    if (!$usuarioId) return;
+
+    // Verificar cantidad de vehículos aprobados
+    $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM vehiculos WHERE usuario_id = ? AND estado = 'aprobado'");
+    $stmtCheck->execute([$usuarioId]);
+    $cantidadAprobados = $stmtCheck->fetchColumn();
+
+    // Si es el primero, cambiar el rol
+    if ($cantidadAprobados == 1) {
+        $stmtRol = $pdo->prepare("UPDATE usuarios SET rol = 'chofer' WHERE id = ?");
+        $stmtRol->execute([$usuarioId]);
+    }
+}
+
+/**
+ * Rechaza un vehículo con un motivo específico.
+ */
+function rechazarVehiculo(PDO $pdo, int $vehiculoId, string $motivo): void {
+    $motivo = trim($motivo);
+    if (empty($motivo)) {
+        $_SESSION['error'] = 'Debe indicar el motivo de rechazo.';
+        header('Location: procesarSolicitudes.php');
+        exit();
+    }
+
+    $stmt = $pdo->prepare("UPDATE vehiculos SET estado = 'rechazado', motivo_rechazo = ? WHERE id = ?");
+    $stmt->execute([$motivo, $vehiculoId]);
+}
+
+/**
+ * Procesa la acción enviada por el formulario (aprobar o rechazar).
+ */
+function procesarAccionVehiculo(PDO $pdo): void {
+    $id = $_POST['id'] ?? null;
+    $accion = $_POST['accion'] ?? null;
+
+    if (!$id || !$accion) {
+        header('Location: procesarSolicitudes.php');
+        exit();
+    }
+
+    if ($accion === 'aprobar') {
+        aprobarVehiculo($pdo, (int)$id);
+        $_SESSION['mensaje'] = '✅ Vehículo aprobado correctamente.';
+    } elseif ($accion === 'rechazar') {
+        rechazarVehiculo($pdo, (int)$id, $_POST['motivo'] ?? '');
+        $_SESSION['mensaje'] = '❌ Vehículo rechazado correctamente.';
+    }
+
+    header('Location: procesarSolicitudes.php');
+    exit();
+}
 
 
 ?>
