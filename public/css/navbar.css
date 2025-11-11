@@ -1,0 +1,75 @@
+/* =============================
+    PALETA PRINCIPAL (EDITABLE)
+============================= */
+:root {
+  --color-principal: #198754;
+  --color-secundario: #00b894;
+  --color-texto-navbar: #ffffff;
+  --color-fondo-navbar: #12291e;
+  --color-fondo-footer: #1a100b;
+}
+
+/* =============================
+   NAVBAR
+============================= */
+.navbar-unificado {
+  background-color: var(--color-fondo-navbar) !important;
+}
+
+.navbar-unificado .navbar-brand span {
+  color: var(--color-texto-navbar);
+}
+
+.navbar-unificado .nav-link,
+.navbar-unificado .dropdown-item {
+  color: var(--color-texto-navbar) !important;
+  transition: color 0.3s ease;
+}
+
+.navbar-unificado .nav-link:hover,
+.navbar-unificado .dropdown-item:hover {
+  color: var(--color-secundario) !important;
+}
+
+.logo-navbar {
+  height: 80px;
+}
+
+@media (max-width: 768px) {
+  .logo-navbar {
+    height: 60px;
+  }
+}
+
+/* =============================
+   DROPDOWN DEL NAVBAR
+============================= */
+.navbar-unificado .dropdown-menu {
+  background-color: var(--color-fondo-navbar);
+  border: none;
+}
+
+.navbar-unificado .dropdown-item {
+  color: var(--color-texto-navbar) !important;
+}
+
+.navbar-unificado .dropdown-item:hover,
+.navbar-unificado .dropdown-item:focus {
+  background-color: var(--color-secundario);
+  color: #fff !important;
+}
+
+/* Corrige el botón del usuario en el Navbar */
+.navbar-unificado .btn,
+.navbar-unificado .btn-outline-light,
+.navbar-unificado .dropdown-toggle {
+  background: transparent !important;
+  color: var(--color-texto-navbar) !important;
+  border: 1px solid var(--color-texto-navbar) !important;
+}
+
+.navbar-unificado .btn:hover,
+.navbar-unificado .dropdown-toggle:hover {
+  background-color: var(--color-secundario) !important;
+  color: #fff !important;
+}

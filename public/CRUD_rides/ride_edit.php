@@ -1,15 +1,20 @@
 <?php
 session_start();
 require_once '../../config/funciones_ride.php';
+include '../includes/navbar.php'; 
 
+// Obtiene el ID del viaje desde la URL (parámetro GET) y lo convierte a entero
+// Y busca el viaje en la base de datos con el ID recibido
 $idViaje = intval($_GET['id'] ?? 0);
 $viaje = getViajeById($idViaje);
 
+// Si no existe el viaje, muestra un mensaje de error y detiene la ejecución
 if (!$viaje) {
   die('<div class="alert alert-danger">Viaje no encontrado.</div>');
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Captura los datos enviados desde el formulario
   $origen = $_POST['origen'];
   $destino = $_POST['destino'];
   $fecha = $_POST['fecha'];
@@ -18,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $tarifa = $_POST['tarifa'];
   $espacios = $_POST['espaciosDisponibles'];
 
+  // Llama a la función que actualiza el viaje en la base de datos
   if (updateViaje($idViaje, $origen, $destino, $fecha, $horaSalida, $horaLlegada, $tarifa, $espacios)) {
     $_SESSION['success'] = "Ride actualizado correctamente.";
     header('Location: listar_ride.php');
@@ -27,17 +33,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Editar Ride</title>
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body class="bg-light">
 <div class="container py-5">
   <h2 class="text-success mb-4">Editar Ride</h2>
   <?= $error ?? '' ?>
+
+  <!-- Formulario con los datos del ride precargados -->
   <form method="POST">
     <div class="mb-3"><label>Origen</label><input type="text" name="origen" value="<?= htmlspecialchars($viaje['origen']) ?>" class="form-control" required></div>
     <div class="mb-3"><label>Destino</label><input type="text" name="destino" value="<?= htmlspecialchars($viaje['destino']) ?>" class="form-control" required></div>

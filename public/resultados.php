@@ -29,6 +29,7 @@ $stmt->execute([
   ':pasajeros' => $pasajeros
 ]);
 
+// Resultados obtenidos
 $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -52,6 +53,7 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php if (count($viajes) > 0): ?>
       <div class="row g-4">
         <?php foreach ($viajes as $viaje): ?>
+          <!-- Información básica del viaje -->
           <div class="col-md-6 col-lg-4">
             <div class="card border-0 shadow-sm h-100">
               <div class="card-body">
@@ -63,7 +65,8 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p class="mb-1"><strong>Fecha:</strong> <?= htmlspecialchars($viaje['fecha']) ?></p>
                 <p class="mb-1"><strong>Tarifa:</strong> ₡<?= number_format($viaje['tarifa'], 2) ?></p>
                 <p><strong>Espacios disponibles:</strong> <?= htmlspecialchars($viaje['espaciosDisponibles']) ?></p>
-
+                
+                <!-- Botón de acción -->
                 <?php if (isset($_SESSION['user_id'])): ?>
                   <button type="button" class="btn btn-success w-100 btn-reservar"
                           data-id="<?= $viaje['idViaje'] ?>"
@@ -86,12 +89,14 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           </div>
         <?php endforeach; ?>
       </div>
+      
+     <!-- Si no hay viajes -->
     <?php else: ?>
       <div class="alert alert-warning text-center mt-5 shadow-sm">
         <strong>No hay viajes disponibles</strong> que coincidan con tu búsqueda.
       </div>
     <?php endif; ?>
-
+     <!-- Botón para volver -->
     <div class="text-center mt-4">
       <a href="index.php" class="btn btn-secondary px-4">Volver al inicio</a>
     </div>
@@ -105,6 +110,7 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <h5 class="modal-title fw-bold">Confirmar reserva</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
+         <!-- Detalles del viaje -->
         <div class="modal-body">
           <p><strong>Viaje:</strong> <span id="res-nombre"></span></p>
           <p><strong>Chofer:</strong> <span id="res-chofer"></span></p>
