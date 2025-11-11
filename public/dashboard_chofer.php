@@ -21,17 +21,22 @@ include('includes/navbar.php');
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <body style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa;">
 
-<!-- Encabezado de bienvenida -->
-<div class="container py-5">
-  <div class="text-center mb-5">
-    <h1 class="fw-bold text-success display-5">Panel de Chofer</h1>
-    <h4 class="text-muted">Bienvenido, 
-
-      <!-- Muestra el nombre del usuario logueado o "Chofer" por defecto -->
-      <span class="fw-bold text-dark"><?= htmlspecialchars($_SESSION["usuario"] ?? "Chofer"); ?></span>
-    </h4>
-    <p class="text-secondary">Gestioná tus vehículos, rides y solicitudes de forma sencilla.</p>
+<!-- Banner con imagen -->
+<div style="position: relative; text-align: center; margin-bottom: 3rem;">
+  <img src="../images/banner3.png" alt="Banner Chofer"
+       style="width:100%; height:400px; object-fit:cover; filter:brightness(60%);">
+  
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff;">
+    <h1 style="font-weight:600; font-size:2.5rem;">¡Hola, <?= htmlspecialchars($_SESSION['nombreUsuario'] ?? 'Chofer') ?>!</h1>
+    <h4 style="font-weight:400;">Gestioná tus vehículos, rides y solicitudes de forma sencilla.</h4>
   </div>
+</div>
+
+<!-- Título centrado sin negrita -->
+<div class="text-center mb-5">
+  <h2 class="text-success" style="font-weight:400; font-size:2rem;">Panel del Chofer</h2>
+</div>
+
 
   <!-- Tarjetas principales -->
   <div class="row g-4">
