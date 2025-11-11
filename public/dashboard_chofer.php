@@ -19,13 +19,15 @@ include('includes/navbar.php');
 
 <!-- Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <body style="font-family: 'Poppins', sans-serif; background-color: #f8f9fa;">
 
+<!-- Encabezado de bienvenida -->
 <div class="container py-5">
   <div class="text-center mb-5">
     <h1 class="fw-bold text-success display-5">Panel de Chofer</h1>
     <h4 class="text-muted">Bienvenido, 
+
+      <!-- Muestra el nombre del usuario logueado o "Chofer" por defecto -->
       <span class="fw-bold text-dark"><?= htmlspecialchars($_SESSION["usuario"] ?? "Chofer"); ?></span>
     </h4>
     <p class="text-secondary">Gestioná tus vehículos, rides y solicitudes de forma sencilla.</p>
@@ -33,6 +35,8 @@ include('includes/navbar.php');
 
   <!-- Tarjetas principales -->
   <div class="row g-4">
+
+    <!-- Tarjeta: Mis Vehículos -->
     <div class="col-md-4">
       <div class="card text-center shadow-sm border-0 h-100 p-3">
         <i class="bi bi-car-front text-success fs-1 mb-3"></i>
@@ -42,6 +46,7 @@ include('includes/navbar.php');
       </div>
     </div>
 
+    <!-- Tarjeta: Mis Rides -->
     <div class="col-md-4">
       <div class="card text-center shadow-sm border-0 h-100 p-3">
         <i class="bi bi-map text-primary fs-1 mb-3"></i>
@@ -50,7 +55,8 @@ include('includes/navbar.php');
         <a href="CRUD_rides/listar_ride.php" class="btn btn-primary">Ver Rides</a>
       </div>
     </div>
-
+    
+    <!-- Tarjeta: Solicitudes -->
     <div class="col-md-4">
       <div class="card text-center shadow-sm border-0 h-100 p-3">
         <i class="bi bi-person-check text-warning fs-1 mb-3"></i>

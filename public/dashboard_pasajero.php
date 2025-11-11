@@ -3,15 +3,17 @@ session_start();
 require_once '../config/database.php';
 include('includes/navbar.php');
 
+//Si el usuario no ha iniciado sesión, lo redirige al login
 if (!isset($_SESSION['user_id'])) {
   header('Location: login.php');
   exit;
 }
 
+//Obtiene información básica del pasajero actual
 $idPasajero = $_SESSION['user_id'];
 $rol = $_SESSION['rol'] ?? 'pasajero';
 
-//  Contar reservas por estado
+//Contar reservas por estado (pendientes, aceptadas, rechazadas
 $sqlResumen = "SELECT 
                   SUM(CASE WHEN estadoReserva = 'pendiente' THEN 1 ELSE 0 END) AS pendientes,
                   SUM(CASE WHEN estadoReserva = 'aceptada' THEN 1 ELSE 0 END) AS aceptadas,
@@ -22,7 +24,7 @@ $stmt = $pdo->prepare($sqlResumen);
 $stmt->execute([':id' => $idPasajero]);
 $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
 
-//  Solicitudes recientes
+//CONSULTA DE SOLICITUDES RECIENTES (últimos 5 viajes)
 $sqlSolicitudes = "SELECT r.estadoReserva, v.nombreViaje, v.origen, v.destino, v.fecha
                    FROM Reservas r
                    INNER JOIN Viajes v ON r.idViaje = v.idViaje
@@ -140,8 +142,9 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
       </div>
     </div>
 
-    <!--  Estado del chofer / registro de vehículo -->
+     <!-- === CONVERSIÓN A CHOFER === -->      
     <?php if ($rol === 'pasajero' && !$vehiculo): ?>
+       <!-- Opción para registrar vehículo -->
       <div class="card border-0 shadow-sm text-center p-4 bg-light">
         <h4 class="fw-bold text-success mb-2">¿Querés ser chofer?</h4>
         <p>Registrá tu primer vehículo y empezá a ofrecer viajes a otros usuarios.</p>
@@ -150,11 +153,13 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
         </a>
       </div>
 
+    <!-- Estado pendiente de aprobación -->
     <?php elseif ($vehiculo && $vehiculo['estado'] === 'pendiente'): ?>
       <div class="alert alert-warning text-center mt-4 shadow-sm">
         Tu solicitud de chofer está en revisión. Pronto recibirás la aprobación 
       </div>
-
+      
+    <!-- Vehículo aprobado -->
     <?php elseif ($vehiculo && $vehiculo['estado'] === 'aprobado'): ?>
       <div class="alert alert-success text-center mt-4 shadow-sm">
         ¡Tu vehículo fue aprobado! Ya podés acceder al panel de chofer 

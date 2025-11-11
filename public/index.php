@@ -14,8 +14,6 @@ include('includes/navbar.php');
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- CSS personalizado -->
@@ -89,9 +87,12 @@ include('includes/navbar.php');
 
   <!-- script JAVASCRIP -->
    <script>
+  
+  // Maneja el envío del formulario de búsqueda
   document.getElementById("buscarViajeForm").addEventListener("submit", function(e) {
     e.preventDefault(); // evita que recargue la página
-
+    
+    // Captura los valores ingresados
     const origen = document.getElementById("origen");
     const destino = document.getElementById("destino");
     const fecha = document.getElementById("fecha");
@@ -109,6 +110,8 @@ include('includes/navbar.php');
     })
     .then(res => res.json())
     .then(data => {
+
+      // Independientemente del resultado, redirige a la página de resultados
       if (data.status === "ok" || data.status === "no_results") {
         // Redirige siempre a resultados.php (maneja ambos casos)
         window.location.href =
@@ -124,7 +127,7 @@ include('includes/navbar.php');
 
 <script>
   
-  // Evitar selección de fechas pasadas
+  // Bloquea la selección de fechas anteriores al día actual
   document.addEventListener("DOMContentLoaded", () => {
     const inputFecha = document.getElementById("fecha");
     const hoy = new Date();

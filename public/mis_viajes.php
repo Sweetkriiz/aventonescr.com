@@ -3,13 +3,16 @@ session_start();
 require_once '../config/database.php';
 include('includes/navbar.php');
 
+// Si el usuario no ha iniciado sesión, lo redirige al login
 if (!isset($_SESSION['user_id'])) {
   header('Location: login.php');
   exit;
 }
 
+// Obtiene el ID del pasajero actual
 $idPasajero = $_SESSION['user_id'];
 
+/* CONSULTA PRINCIPAL: Reservas del pasajero actual  */
 $sql = "SELECT r.idReserva, r.estadoReserva, r.fechaSolicitud,
                v.nombreViaje, v.origen, v.destino, v.horaSalida, v.horaLlegada, v.tarifa, v.fecha,
                u.nombre AS chofer_nombre
@@ -30,12 +33,14 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mis Viajes - Aventones CR</title>
-
+  
+  <!-- Bootstrap, íconos y fuentes -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
+  
+  <!-- Estilos internos -->
   <style>
     body { font-family: 'Poppins', sans-serif; background-color: #f9f9f9; }
     .estado-pendiente { color: #ffc107; font-weight: bold; }
@@ -49,8 +54,9 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body>
 
 <div class="container my-5">
-  <h2 class="text-center mb-4 fw-bold" style="color:#285936;">Mis Viajes</h2>
-
+    <h2 class="text-center mb-4 fw-bold" style="color:#285936;">Mis Viajes</h2>
+  
+    <!-- Si hay reservas, muestra la tabla -->
   <?php if (count($reservas) > 0): ?>
     <div class="card shadow-sm">
       <div class="card-body">
@@ -77,11 +83,15 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= htmlspecialchars($r['destino']) ?></td>
                 <td><?= htmlspecialchars($r['fecha']) ?></td>
                 <td><span class="badge bg-success">₡<?= number_format($r['tarifa'], 2) ?></span></td>
+                
+                <!-- Estado visual -->
                 <td>
                   <span class="estado-<?= strtolower($r['estadoReserva']) ?>" id="estado-<?= $r['idReserva'] ?>">
                     <?= ucfirst($r['estadoReserva']) ?>
                   </span>
                 </td>
+
+                <!-- Botón cancelar (solo si está pendiente) -->
                 <td>
                   <?php if ($r['estadoReserva'] === 'pendiente'): ?>
                     <button class="btn btn-outline-danger btn-sm btn-cancelar" data-bs-toggle="modal" data-bs-target="#cancelarModal" data-id="<?= $r['idReserva'] ?>">
@@ -100,6 +110,7 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
       </div>
     </div>
+    <!-- Si no hay reservas -->
   <?php else: ?>
     <div class="alert alert-info text-center mt-5 shadow-sm">
       No tienes viajes reservados aún.
@@ -136,18 +147,21 @@ document.querySelectorAll('.btn-cancelar').forEach(boton => {
   });
 });
 
-// Confirmar cancelación (solo visual)
+// Simula cancelación visual al confirmar (sin recargar)
 document.getElementById('confirmarCancelar').addEventListener('click', () => {
   if (!reservaSeleccionada) return;
-
+  
+  // Cambia el estado en pantalla
   const estado = document.getElementById(`estado-${reservaSeleccionada}`);
   estado.textContent = "Cancelada";
   estado.className = "estado-cancelada";
-
+  
+  // Desactiva el botón de cancelar
   const fila = document.getElementById(`reserva-${reservaSeleccionada}`);
   const boton = fila.querySelector('.btn-cancelar');
   boton.remove();
-
+  
+  // Cierra el modal
   const modal = bootstrap.Modal.getInstance(document.getElementById('cancelarModal'));
   modal.hide();
 });

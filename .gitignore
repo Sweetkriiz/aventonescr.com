@@ -1,0 +1,23 @@
+# --- Archivos generados dinámicamente ---
+/public/uploads/
+/tmp/
+/cache/
+
+# --- Configuración local ---
+.env
+/config/database_local.php
+/config/credenciales.php
+
+# --- Archivos del sistema ---
+*.log
+*.bak
+*.tmp
+*.DS_Store
+Thumbs.db
+
+# --- VS Code ---
+.vscode/
+
+# --- Node / Composer (si aplicara en el futuro) ---
+/node_modules/
+/vendor/

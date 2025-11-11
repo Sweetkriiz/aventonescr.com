@@ -2,6 +2,9 @@
 session_start();
 require_once '../config/database.php';
 
+include 'includes/navbar.php';
+
+
 // Verificar sesión
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -14,16 +17,15 @@ $idChofer = $_SESSION['user_id'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['accion'], $_POST['idReserva'])) {
     $accion = $_POST['accion'];
     $idReserva = intval($_POST['idReserva']);
-
+     // Validar acción permitida
     if (in_array($accion, ['aceptar', 'rechazar'])) {
         $nuevoEstado = ($accion === 'aceptar') ? 'aceptada' : 'rechazada';
-
+         // Actualiza el estado de la reserva
         $stmt = $pdo->prepare("UPDATE Reservas SET estadoReserva = ? WHERE idReserva = ?");
         $stmt->execute([$nuevoEstado, $idReserva]);
 
-        $_SESSION['success'] = " Solicitud {$nuevoEstado} correctamente.";
-        header("Location: solicitudes_chofer.php");
-        exit();
+     
+        echo "<div class='alert alert-success text-center'>Solicitud {$nuevoEstado} correctamente.</div>";
     }
 }
 
@@ -49,19 +51,19 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
   <meta charset="UTF-8">
   <title>Solicitudes de Pasajeros - Aventones CR</title>
+   
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
 </head>
 <body class="bg-light">
 <div class="container py-5">
   <h2 class="fw-bold text-success mb-4">Solicitudes de Pasajeros</h2>
 
-  <?php if (!empty($_SESSION['success'])): ?>
-  <div class="alert alert-success">
-    <?= $_SESSION['success']; ?>
-  </div>
-  <?php unset($_SESSION['success']); ?>  <!-- limpia el mensaje después de mostrar -->
-<?php endif; ?>
-
+    <!-- Tabla con las solicitudes de los pasajeros -->
 
   <?php if ($reservas): ?>
     <div class="card shadow">
@@ -91,6 +93,7 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <td>₡<?= number_format($r['tarifa'], 2) ?></td>
                 <td><?= htmlspecialchars($r['fecha']) ?></td>
                 <td><?= htmlspecialchars($r['horaSalida']) ?></td>
+                <!-- Estado con badge de color -->
                 <td>
                   <?php
                     $badge = match ($r['estadoReserva']) {
@@ -102,6 +105,7 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
                   ?>
                   <span class="badge bg-<?= $badge ?>"><?= ucfirst($r['estadoReserva']) ?></span>
                 </td>
+                 <!-- Botones de acción -->
                 <td>
                   <?php if ($r['estadoReserva'] === 'pendiente'): ?>
                     <form method="POST" style="display:inline;">
@@ -119,10 +123,11 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </table>
       </div>
     </div>
+    <!-- Si no hay solicitudes -->
   <?php else: ?>
     <div class="alert alert-secondary text-center">No hay solicitudes de pasajeros.</div>
   <?php endif; ?>
-
+  <!-- Botón de regreso -->
   <div class="mt-4 text-center">
     <a href="dashboard_chofer.php" class="btn btn-secondary">Volver al Panel</a>
   </div>
