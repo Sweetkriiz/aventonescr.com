@@ -18,16 +18,16 @@ include('includes/navbar.php');
 </head>
 <body>
 
-   <!--  Banner -->
+  <!-- Banner con imagen -->
+<div style="position: relative; text-align: center; margin-bottom: 3rem;">
+  <img src="../images/banner4.png" alt="Banner Administrador"
+       style="width:100%; height:400px; object-fit:cover; filter:brightness(60%);">
   
-
-  <div class="container py-5 text-center">
-    <h1 class="fw-bold mb-2"><span>Panel de Administrador</h1> </span>
-    <h4 class="text-muted mb-4">Bienvenido,
-    <span class="fw-bold text-dark"><?= htmlspecialchars($_SESSION["usuario"] ?? "administrador"); ?></span>
-    </h4>
-    <p class="text-muted mb-5">Gestiona usuarios, solicitudes de choferes y viajes registrados en el sistema.</p>
-
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff;">
+    <h1 style="font-weight:600; font-size:2.5rem;">Bienvenido, <?= htmlspecialchars($_SESSION["usuario"] ?? "administrador")?>!</h1>
+    <h4 style="font-weight:400;">Gestiona usuarios, solicitudes de choferes y viajes registrados en el sistema.</h4>
+  </div>
+</div>
     <div class="row justify-content-center g-4">
       <!-- Usuarios -->
       <div class="col-md-3">
@@ -49,7 +49,7 @@ include('includes/navbar.php');
           </div>
           <h5 class="fw-bold">Solicitudes de Choferes</h5>
           <p>Revisá y aprobá los vehículos registrados por choferes.</p>
-          <a href="ver_solicitudes.php" class="btn btn-warning btn-custom w-100 text-white">Ver Solicitudes</a>
+          <a href="procesarSolicitudes.php" class="btn btn-warning btn-custom w-100 text-white">Ver Solicitudes</a>
         </div>
       </div>
 

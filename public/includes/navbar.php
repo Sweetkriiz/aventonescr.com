@@ -70,8 +70,7 @@ if (session_status() === PHP_SESSION_NONE) {
               <li><h6 class="dropdown-header">Gestión Interna </h6></li>
               
               <!-- Gestión interna -->
-              <li><a class="dropdown-item" href="/dashboard_admin.php"><i class="bi bi-tools me-1"></i> Gestión de Vehículos</a></li>
-              <li><a class="dropdown-item" href="../CRUD_admin/listar_usuarios.php"><i class="bi bi-people me-1"></i> Gestión de Usuarios</a></li>
+              <li><a class="dropdown-item" href="/dashboard_admin.php"><i class="bi bi-tools me-1"></i> Panel de Administración</a></li>
 
               <li><hr class="dropdown-divider"></li>
               <li><h6 class="dropdown-header">Paneles de Vista</h6></li>
