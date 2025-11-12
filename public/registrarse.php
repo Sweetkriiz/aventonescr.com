@@ -52,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // --- GUARDAR EN BD SI NO HAY ERRORES ---
+    
     if (empty($errores)) {
         try {
-            // Hashear con SHA-256 (igual que en el login)
+            // Hashear con SHA-256 
             $hashedPassword = hash('sha256', $password);
 
             $sql = "INSERT INTO Usuarios 

@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 include('includes/navbar.php');
 ?>
 
@@ -17,8 +16,7 @@ include('includes/navbar.php');
 
 </head>
 <body>
-
-  <!-- Banner con imagen -->
+<!-- Banner con imagen -->
 <div style="position: relative; text-align: center; margin-bottom: 3rem;">
   <img src="../images/banner4.png" alt="Banner Administrador"
        style="width:100%; height:400px; object-fit:cover; filter:brightness(60%);">
@@ -52,20 +50,6 @@ include('includes/navbar.php');
           <a href="procesarSolicitudes.php" class="btn btn-warning btn-custom w-100 text-white">Ver Solicitudes</a>
         </div>
       </div>
-
-      <!-- Reportes -->
-      <div class="col-md-3">
-        <div class="card p-4">
-          <div class="text-primary mb-3">
-            <i class="bi bi-map-fill fs-1"></i>
-          </div>
-          <h5 class="fw-bold">Reportes</h5>
-          <p>Gestiona reportes de viajes registrados en el sistema.</p>
-          <a href="listar_ride.php" class="btn btn-primary btn-custom w-100">Ver Viajes</a>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <footer class="text-center py-3 bg-dark text-white mt-5">
   © 2025 Aventones CR | Panel del Administración
