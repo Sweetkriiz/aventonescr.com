@@ -67,7 +67,7 @@ $usuarios = obtenerUsuarios();
                       <span class="badge <?= $rolColor ?>"><?= ucfirst($u['rol']) ?></span>
                     </td>
                     <td>
-                      <!-- Ver -->
+                      <!-- Ver Detalles -->
                       <a href="#"
                         class="btn btn-outline-primary btn-sm"
                         title="Ver"
@@ -91,7 +91,7 @@ $usuarios = obtenerUsuarios();
                         <i class="bi bi-pencil-square"></i>
                       </a>
 
-                      <!-- Eliminar (abre modal) -->
+                      <!-- Eliminar, abre un modal  -->
                       <button type="button"
                               class="btn btn-outline-danger btn-sm"
                               title="Eliminar"
@@ -107,7 +107,7 @@ $usuarios = obtenerUsuarios();
               </tbody>
             </table>
           </div>
-
+           <!-- En caso de no haber usuarios -->            
         <?php else: ?>
           <div class="text-center py-5">
             <i class="bi bi-people fs-1 text-muted mb-3"></i>
@@ -129,7 +129,7 @@ $usuarios = obtenerUsuarios();
     </div>
   </div>
 
-  <!-- Modal Confirmar Eliminación -->
+  <!-- Modal para confirmar eliminación -->
   <div class="modal fade" id="modalEliminarUsuario" tabindex="-1" aria-labelledby="modalEliminarUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
@@ -156,7 +156,7 @@ $usuarios = obtenerUsuarios();
     </div>
   </div>
 
-  <!-- Modal Información del Usuario -->
+  <!-- Modal información del usuario -->
   <div class="modal fade" id="verUsuarioModal" tabindex="-1" aria-labelledby="verUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow-sm">

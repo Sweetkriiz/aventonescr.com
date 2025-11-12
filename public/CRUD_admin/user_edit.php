@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="bi bi-arrow-left-circle"></i> Volver a Lista
           </a>
         </div>
-
+        
         <?php if (!empty($errores)): ?>
           <div class="alert alert-danger">
             <ul class="mb-0"><?php foreach ($errores as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?></ul>

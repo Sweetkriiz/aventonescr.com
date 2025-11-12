@@ -4,22 +4,21 @@ session_start();
 require_once '../../config/database.php';
 require_once __DIR__ . '/../../config/funciones_admin.php';
 include("../includes/navbar.php");
-
+//Verificar que el usuario es administrador
 if (!isset($_SESSION["usuario"]) || $_SESSION["rol"] !== 'administrador') {
     $_SESSION['error'] = 'Acceso denegado.';
     header('Location: listar_usuarios.php');
     exit();
 }
 
-
+// Verificar que la solicitud es POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $_SESSION['error'] = 'Método no permitido.';
     header('Location: listar_usuarios.php');
     exit();
 }
-
+// Obtener y validar ID del usuario a eliminar
 $id = intval($_POST['id'] ?? 0);
-
 if ($id <= 0) {
     $_SESSION['error'] = 'ID inválido.';
     header('Location: listar_usuarios.php');

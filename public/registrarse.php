@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telefono = trim($_POST['telefono']);
     $rol = 'pasajero'; // Valor por defecto
 
-    // --- VALIDACIONES BÁSICAS ---
+    // Validaciones 
     if (empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
         empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)) {
         $errores[] = "Todos los campos son obligatorios.";
     }
-
+      //Válida el formato del correo electrónico
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $errores[] = "El correo electrónico no es válido.";
     }
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = "La contraseña debe tener al menos 8 caracteres.";
     }
 
-    // --- VALIDAR DUPLICADOS ---
+    // Validación de duplicados
     if (empty($errores)) {
         try {
             $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
@@ -189,8 +189,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </div>
-
+ 
 <?php if ($mensaje): ?>
+  <!-- Js del modal-->
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
@@ -204,7 +205,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </script>
   
 <?php endif; ?>
-
 
   <footer class="footer bg-light border-top mt-5 py-4">
     <div class="container d-flex flex-wrap justify-content-between align-items-center">
