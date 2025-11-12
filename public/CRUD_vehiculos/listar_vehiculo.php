@@ -3,6 +3,13 @@ session_start();
 require_once '../../config/funciones_carro.php';
 include '../includes/navbar.php'; 
 
+$dashboardURL = ($_SESSION['rol'] === 'chofer')
+  ? '../dashboard_chofer.php'
+  : '../dashboard_pasajero.php';
+
+
+
+
 // Obtiene el ID del chofer logueado
 $idChofer = $_SESSION['user_id'] ?? null;
 
@@ -106,8 +113,9 @@ $pendientes = getVehiculosPendientes($idChofer);
   <?php endif; ?>
 
   <div class="mt-4 text-center">
-    <a href="../dashboard_chofer.php" class="btn btn-secondary">Volver al Panel</a>
+    <a href="<?= $dashboardURL ?>" class="btn btn-secondary">Volver al Panel</a>
   </div>
+
 
     <!-- Modal de confirmación -->
   <div class="modal fade" id="confirmarEliminar<?= $v['idVehiculo'] ?>" tabindex="-1" aria-hidden="true">

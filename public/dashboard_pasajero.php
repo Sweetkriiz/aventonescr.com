@@ -144,6 +144,7 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
 
      <!-- === CONVERSIÓN A CHOFER === -->      
     <?php if ($rol === 'pasajero' && !$vehiculo): ?>
+      
        <!-- Opción para registrar vehículo -->
       <div class="card border-0 shadow-sm text-center p-4 bg-light">
         <h4 class="fw-bold text-success mb-2">¿Querés ser chofer?</h4>

@@ -7,8 +7,8 @@ include('includes/navbar.php');
 
 $idUsuario = $_SESSION['user_id'];
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leido_id'])) {
-    $vehiculoId = $_POST['leido_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leido'])) {
+    $vehiculoId = $_POST['leido'];
 
     $stmt = $pdo->prepare("UPDATE vehiculos SET leido = 1 WHERE idVehiculo = ?");
     $stmt->execute([$vehiculoId]);
@@ -128,7 +128,6 @@ $vehiculos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
   <?php endforeach; ?>
 <?php endif; ?>
-
 
 
 
