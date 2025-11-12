@@ -4,7 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/funciones_admin.php';
 include('includes/navbar.php');
 
-// --- Procesar aprobación o rechazo ---
+    //Procesar aprobación
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idVehiculo = $_POST['id'] ?? null;
     $accion = $_POST['accion'] ?? null;
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$idVehiculo]);
 
-        // --- Cambiar rol a chofer si aplica ---
+        // Cambiar rol a chofer 
         $stmtChofer = $pdo->prepare("SELECT idChofer FROM vehiculos WHERE idVehiculo = ?");
         $stmtChofer->execute([$idVehiculo]);
         $idChofer = $stmtChofer->fetchColumn();
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['mensaje'] = "Vehículo aprobado correctamente.";
         header("Location: procesarSolicitudes.php");
         exit();
-
+    //Procesar rechazo
     } elseif ($accion === 'rechazar' && $idVehiculo) {
         $motivo = trim($_POST['motivo'] ?? '');
         if (empty($motivo)) {
@@ -61,10 +61,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- Filtro de búsqueda ---
+//Filtro de búsqueda 
 $busqueda = $_GET['busqueda'] ?? null;
 
-// --- Consulta dinámica ---
+// Consulta de vehículos pendientes, aprobados o rechazados
 if (!empty($busqueda)) {
     $stmt = $pdo->prepare("
         SELECT 
@@ -109,6 +109,7 @@ if (!empty($busqueda)) {
         WHERE v.estado IN ('pendiente','rechazado','aprobado')
         ORDER BY v.idVehiculo DESC
     ");
+    // Obtener todos los vehículos pendientes, aprobados o rechazados
     $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
@@ -162,7 +163,7 @@ if (!empty($busqueda)) {
         </a>
       </form>
     </div>
-
+  <!-- Cards de vehículos-->
   <?php if (empty($vehiculosPendientes)): ?>
     <div class="alert alert-info text-center">No se encontraron vehículos.</div>
   <?php else: ?>
@@ -193,7 +194,7 @@ if (!empty($busqueda)) {
                   </span>
                 </p>
 
-                <!-- ✅ Mostrar motivo de rechazo si aplica -->
+                <!-- Mostrar motivo de rechazo -->
                 <?php if ($vehiculo['estado'] === 'rechazado' && !empty($vehiculo['motivoRechazo'])): ?>
                   <p class="card-text text-muted small mb-3">
                     <strong>Motivo:</strong> <?= htmlspecialchars($vehiculo['motivoRechazo']) ?>
@@ -257,6 +258,7 @@ if (!empty($busqueda)) {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+   <!-- Js para obtener el id del modal  -->
   <script>
     const modalRechazo = document.getElementById('modalRechazo');
     modalRechazo.addEventListener('show.bs.modal', event => {

@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt = $pdo->prepare($sql);
       $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $telefono, $rol, $id]);
 
-      // ✅ Redirigir con mensaje de éxito
+      // Redirigir con mensaje de éxito
       $_SESSION['success'] = 'Usuario actualizado correctamente.';
       header('Location: listar_usuarios.php');
       exit();
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="bi bi-arrow-left-circle"></i> Volver a Lista
           </a>
         </div>
-        
+         <!-- Mensaje de error -->
         <?php if (!empty($errores)): ?>
           <div class="alert alert-danger">
             <ul class="mb-0"><?php foreach ($errores as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?></ul>
