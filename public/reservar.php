@@ -40,16 +40,16 @@ try {
 
   // Inserta la nueva reserva
   $pdo->prepare("INSERT INTO Reservas (idViaje, idPasajero) VALUES (?, ?)")->execute([$idViaje, $idPasajero]);
-  
+
   // Reduce la cantidad de espacios disponibles del viaje
   $pdo->prepare("UPDATE Viajes SET espaciosDisponibles = espaciosDisponibles - 1 WHERE idViaje = ?")->execute([$idViaje]);
-  
+
   // Si todo salió bien, confirma la transacción
   $pdo->commit();
 
   echo json_encode(['status' => 'ok', 'mensaje' => 'Reserva registrada correctamente.']);
 } catch (Exception $e) {
-   //  Si algo falla, se revierte la transacción
+  //  Si algo falla, se revierte la transacción
   if ($pdo->inTransaction()) $pdo->rollBack();
   echo json_encode(['status' => 'error', 'mensaje' => 'Error al registrar la reserva.']);
 }

@@ -3,6 +3,8 @@ session_start();
 require_once '../config/database.php';
 include('includes/navbar.php');
 
+
+
 //Si el usuario no ha iniciado sesión, lo redirige al login
 if (!isset($_SESSION['user_id'])) {
   header('Location: login.php');
@@ -43,15 +45,16 @@ $vehiculo = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Si el vehículo fue aprobado, actualizar el rol automáticamente
 if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'chofer') {
-    $updateRol = $pdo->prepare("UPDATE Usuarios SET rol = 'chofer' WHERE idUsuario = :id");
-    $updateRol->execute([':id' => $idPasajero]);
-    $_SESSION['rol'] = 'chofer'; // Refrescar también en sesión
+  $updateRol = $pdo->prepare("UPDATE Usuarios SET rol = 'chofer' WHERE idUsuario = :id");
+  $updateRol->execute([':id' => $idPasajero]);
+  $_SESSION['rol'] = 'chofer'; // Refrescar también en sesión
 }
 
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>Panel del Pasajero - Aventones CR</title>
@@ -60,6 +63,7 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/pasajero.css">
 </head>
+
 <body>
 
   <!--  Banner -->
@@ -69,6 +73,49 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
       <p>Bienvenido a tu panel personal. Aquí podés ver tus viajes y convertirte en chofer.</p>
     </div>
   </div>
+
+  <?php
+  // --- Mostrar si tiene vehículo rechazado sin leer ---
+  $stmt = $pdo->prepare("
+    SELECT idVehiculo, marca, modelo, motivoRechazo
+    FROM vehiculos
+    WHERE idChofer = ? AND estado = 'rechazado' AND leido = 0
+  ");
+  $stmt->execute([$idPasajero]);
+  $vehiculoRechazado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if ($vehiculoRechazado):
+  ?>
+    <div class="alert alert-danger alert-dismissible fade show text-center mx-auto mt-4" style="max-width:700px;">
+      Tu vehículo <strong><?= htmlspecialchars($vehiculoRechazado['marca'] . ' ' . $vehiculoRechazado['modelo']) ?></strong> fue rechazado.<br>
+      <small class="text-muted">Motivo: <?= htmlspecialchars($vehiculoRechazado['motivoRechazo']) ?></small>
+      <form method="POST" class="d-inline">
+        <input type="hidden" name="leido_pasajero" value="<?= $vehiculoRechazado['idVehiculo'] ?>">
+        <button type="submit" class="btn-close"></button>
+      </form>
+    </div>
+  <?php endif; ?>
+
+  <?php
+
+  // --- Marcar como leído si el pasajero cierra la alerta ---
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['leido_pasajero'])) {
+    $vehiculoId = $_POST['leido_pasajero'];
+    $stmt = $pdo->prepare("UPDATE vehiculos SET leido = 1 WHERE idVehiculo = ?");
+    $stmt->execute([$vehiculoId]);
+    header("Location: dashboard_pasajero.php");
+    exit();
+  }
+  ?>
+
+  <?php if ($vehiculoRechazado): ?>
+    <div class="text-center mb-4">
+      <a href="CRUD_vehiculos/car_create.php" class="btn btn-success">
+        <i class="bi bi-car-front"></i> ¿Querés volver a intentar ser chofer?
+      </a>
+    </div>
+  <?php endif; ?>
+
 
   <!--  Resumen de reservas -->
   <div class="container my-5 main-content">
@@ -114,24 +161,24 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
               </thead>
               <tbody>
                 <?php foreach ($solicitudes as $s): ?>
-                <tr>
-                  <td><?= htmlspecialchars($s['nombreViaje']) ?></td>
-                  <td><?= htmlspecialchars($s['origen']) ?></td>
-                  <td><?= htmlspecialchars($s['destino']) ?></td>
-                  <td><?= htmlspecialchars($s['fecha']) ?></td>
-                  <td>
-                    <?php
+                  <tr>
+                    <td><?= htmlspecialchars($s['nombreViaje']) ?></td>
+                    <td><?= htmlspecialchars($s['origen']) ?></td>
+                    <td><?= htmlspecialchars($s['destino']) ?></td>
+                    <td><?= htmlspecialchars($s['fecha']) ?></td>
+                    <td>
+                      <?php
                       $estado = strtolower($s['estadoReserva']);
-                      $color = match($estado) {
+                      $color = match ($estado) {
                         'pendiente' => 'warning',
                         'aceptada' => 'success',
                         'rechazada' => 'danger',
                         default => 'secondary'
                       };
-                    ?>
-                    <span class="badge bg-<?= $color ?>"><?= ucfirst($s['estadoReserva']) ?></span>
-                  </td>
-                </tr>
+                      ?>
+                      <span class="badge bg-<?= $color ?>"><?= ucfirst($s['estadoReserva']) ?></span>
+                    </td>
+                  </tr>
                 <?php endforeach; ?>
               </tbody>
             </table>
@@ -142,10 +189,10 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
       </div>
     </div>
 
-     <!-- === CONVERSIÓN A CHOFER === -->      
+    <!-- === CONVERSIÓN A CHOFER === -->
     <?php if ($rol === 'pasajero' && !$vehiculo): ?>
-      
-       <!-- Opción para registrar vehículo -->
+
+      <!-- Opción para registrar vehículo -->
       <div class="card border-0 shadow-sm text-center p-4 bg-light">
         <h4 class="fw-bold text-success mb-2">¿Querés ser chofer?</h4>
         <p>Registrá tu primer vehículo y empezá a ofrecer viajes a otros usuarios.</p>
@@ -155,16 +202,17 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
 
       </div>
 
-    <!-- Estado pendiente de aprobación -->
+      <!-- Estado pendiente de aprobación -->
     <?php elseif ($vehiculo && $vehiculo['estado'] === 'pendiente'): ?>
       <div class="alert alert-warning text-center mt-4 shadow-sm">
-        Tu solicitud de chofer está en revisión. Pronto recibirás la aprobación 
+        Tu solicitud de chofer está en revisión. Pronto recibirás la aprobación
       </div>
-      
-    <!-- Vehículo aprobado -->
+
+
+      <!-- Vehículo aprobado -->
     <?php elseif ($vehiculo && $vehiculo['estado'] === 'aprobado'): ?>
       <div class="alert alert-success text-center mt-4 shadow-sm">
-        ¡Tu vehículo fue aprobado! Ya podés acceder al panel de chofer 
+        ¡Tu vehículo fue aprobado! Ya podés acceder al panel de chofer
       </div>
       <a href="dashboard_chofer.php" class="btn btn-success mt-3 px-4 d-block mx-auto" style="width:max-content;">
         Ir al panel de chofer
@@ -179,4 +227,5 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -24,11 +24,30 @@ function getVehiculoById($id) {
 // Crear vehículo nuevo (queda pendiente de aprobación)
 function createVehiculo($idChofer, $marca, $modelo, $anio, $color, $placa, $fotografia = null) {
     global $pdo;
+
+    // Verificar si ya existe una placa igual
+    $sqlCheck = "SELECT COUNT(*) FROM vehiculos WHERE placa = :placa";
+    $stmtCheck = $pdo->prepare($sqlCheck);
+    $stmtCheck->execute([':placa' => $placa]);
+    $existe = $stmtCheck->fetchColumn();
+
+    if ($existe > 0) {
+        // Si la placa ya existe, devolvemos un mensaje de error en lugar de hacer el INSERT
+        return "Esa placa ya está registrada. Verifica los datos.";
+    }
+
+    //  Insertar el vehículo nuevo si la placa no existe
     $stmt = $pdo->prepare("
         INSERT INTO vehiculos (idChofer, marca, modelo, anio, color, placa, fotografia, estado)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'pendiente')
     ");
-    return $stmt->execute([$idChofer, $marca, $modelo, $anio, $color, $placa, $fotografia]);
+
+    // Si el insert se ejecuta correctamente, devolvemos true
+    if ($stmt->execute([$idChofer, $marca, $modelo, $anio, $color, $placa, $fotografia])) {
+        return true;
+    } else {
+        return "Error al registrar el vehículo.";
+    }
 }
 
 

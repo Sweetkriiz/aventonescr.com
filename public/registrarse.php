@@ -6,75 +6,78 @@ $mensaje = "";
 $errores = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = trim($_POST['nombre']);
-    $apellidos = trim($_POST['apellidos']);
-    $cedula = trim($_POST['cedula']);
-    $fechaNacimiento = $_POST['fechaNacimiento'];
-    $nombreUsuario = trim($_POST['nombreUsuario']);
-    $correo = trim($_POST['correo']);
-    $password = $_POST['password'];
-    $confirmar = $_POST['contrasena'];
-    $telefono = trim($_POST['telefono']);
-    $rol = 'pasajero'; // Valor por defecto
+  $nombre = trim($_POST['nombre']);
+  $apellidos = trim($_POST['apellidos']);
+  $cedula = trim($_POST['cedula']);
+  $fechaNacimiento = $_POST['fechaNacimiento'];
+  $nombreUsuario = trim($_POST['nombreUsuario']);
+  $correo = trim($_POST['correo']);
+  $password = $_POST['password'];
+  $confirmar = $_POST['contrasena'];
+  $telefono = trim($_POST['telefono']);
+  $rol = 'pasajero'; // Valor por defecto
 
-    // --- VALIDACIONES BÁSICAS ---
-    if (empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
-        empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)) {
-        $errores[] = "Todos los campos son obligatorios.";
-    }
+  // --- VALIDACIONES BÁSICAS ---
+  if (
+    empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
+    empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)
+  ) {
+    $errores[] = "Todos los campos son obligatorios.";
+  }
 
-    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-        $errores[] = "El correo electrónico no es válido.";
-    }
+  if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+    $errores[] = "El correo electrónico no es válido.";
+  }
 
-    if ($password !== $confirmar) {
-        $errores[] = "Las contraseñas no coinciden.";
-    }
+  if ($password !== $confirmar) {
+    $errores[] = "Las contraseñas no coinciden.";
+  }
 
-    if (strlen($password) < 8) {
-        $errores[] = "La contraseña debe tener al menos 8 caracteres.";
-    }
+  if (strlen($password) < 8) {
+    $errores[] = "La contraseña debe tener al menos 8 caracteres.";
+  }
 
-    // --- VALIDAR DUPLICADOS ---
-    if (empty($errores)) {
-        try {
-            $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
+  // --- VALIDAR DUPLICADOS ---
+  if (empty($errores)) {
+    try {
+      $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
                          WHERE correo = ? OR cedula = ? OR telefono = ? OR nombreUsuario = ?";
-            $stmtCheck = $pdo->prepare($sqlCheck);
-            $stmtCheck->execute([$correo, $cedula, $telefono, $nombreUsuario]);
-            $existe = $stmtCheck->fetchColumn();
+      $stmtCheck = $pdo->prepare($sqlCheck);
+      $stmtCheck->execute([$correo, $cedula, $telefono, $nombreUsuario]);
+      $existe = $stmtCheck->fetchColumn();
 
-            if ($existe > 0) {
-                $errores[] = "El correo, cédula, teléfono o nombre de usuario ya están registrados.";
-            }
-        } catch (PDOException $e) {
-            $errores[] = "Error al verificar duplicados: " . $e->getMessage();
-        }
+      if ($existe > 0) {
+        $errores[] = "El correo, cédula, teléfono o nombre de usuario ya están registrados.";
+      }
+    } catch (PDOException $e) {
+      $errores[] = "Error al verificar duplicados: " . $e->getMessage();
     }
+  }
 
-    
-    if (empty($errores)) {
-        try {
-            // Hashear con SHA-256 
-            $hashedPassword = hash('sha256', $password);
 
-            $sql = "INSERT INTO Usuarios 
+  if (empty($errores)) {
+    try {
+      // Hashear con SHA-256 
+      $hashedPassword = hash('sha256', $password);
+
+      $sql = "INSERT INTO Usuarios 
                     (nombre, apellidos, cedula, fechaNacimiento, nombreUsuario, correo, contrasena, telefono, rol)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $hashedPassword, $telefono, $rol]);
+      $stmt = $pdo->prepare($sql);
+      $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $hashedPassword, $telefono, $rol]);
 
-            $mensaje = true; 
-        } catch (PDOException $e) {
-            $errores[] = "Error al registrar el usuario: " . $e->getMessage();
-        }
+      $mensaje = true;
+    } catch (PDOException $e) {
+      $errores[] = "Error al registrar el usuario: " . $e->getMessage();
     }
+  }
 }
 ?>
 
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>Registro - Aventones CR</title>
@@ -87,13 +90,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
   <?php if (!empty($errores)): ?>
-  <div class="alert alert-danger mt-3">
-    <ul class="mb-0">
-      <?php foreach ($errores as $error): ?>
-        <li><?= htmlspecialchars($error) ?></li>
-      <?php endforeach; ?>
-    </ul>
-  </div>
+    <div class="alert alert-danger mt-3">
+      <ul class="mb-0">
+        <?php foreach ($errores as $error): ?>
+          <li><?= htmlspecialchars($error) ?></li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
   <?php endif; ?>
 
   <div class="register-container d-flex flex-wrap justify-content-center align-items-stretch my-5 shadow rounded overflow-hidden">
@@ -157,53 +160,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
       </form>
 
-      <p class="text-center mt-3 mb-0">¿Ya tienes una cuenta? 
+      <p class="text-center mt-3 mb-0">¿Ya tienes una cuenta?
         <a href="login.php" class="text-decoration-none text-success fw-semibold">Iniciar sesión</a>
       </p>
     </div>
   </div>
 
-<!-- Modal de éxito -->
-<div class="modal fade" id="registroExitoso" tabindex="-1" aria-labelledby="registroExitosoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-      <div class="position-relative bg-gradient" 
-           style="background: linear-gradient(135deg, #16a34a, #22c55e); height: 160px;">
-        <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
-          <i class="bi bi-check-circle-fill display-3 mb-2"></i>
-          <h4 class="fw-bold mb-0">¡Registro exitoso!</h4>
+  <!-- Modal de éxito -->
+  <div class="modal fade" id="registroExitoso" tabindex="-1" aria-labelledby="registroExitosoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="position-relative bg-gradient"
+          style="background: linear-gradient(135deg, #16a34a, #22c55e); height: 160px;">
+          <div class="position-absolute top-50 start-50 translate-middle text-center text-white">
+            <i class="bi bi-check-circle-fill display-3 mb-2"></i>
+            <h4 class="fw-bold mb-0">¡Registro exitoso!</h4>
+          </div>
         </div>
-      </div>
-      <div class="modal-body text-center p-5">
-        <p class="fs-5 text-muted mb-4">
-          Tu cuenta ha sido creada correctamente.  
-          Ya puedes iniciar sesión y comenzar a usar Aventones CR.
-        </p>
-        <a href="login.php" class="btn btn-success px-4 py-2 rounded-pill shadow-sm">
-          <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
-        </a>
-      </div>
-      <div class="text-center pb-4">
-        <small class="text-muted">© 2025 Aventones CR</small>
+        <div class="modal-body text-center p-5">
+          <p class="fs-5 text-muted mb-4">
+            Tu cuenta ha sido creada correctamente.
+            Ya puedes iniciar sesión y comenzar a usar Aventones CR.
+          </p>
+          <a href="login.php" class="btn btn-success px-4 py-2 rounded-pill shadow-sm">
+            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+          </a>
+        </div>
+        <div class="text-center pb-4">
+          <small class="text-muted">© 2025 Aventones CR</small>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<?php if ($mensaje): ?>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
-      modal.show();
-      const form = document.querySelector("form");
-      if (form) form.reset();
-      setTimeout(() => {
-        window.location.href = "login.php";
-      }, 4000);
-    });
-  </script>
-  
-<?php endif; ?>
+  <?php if ($mensaje): ?>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
+        modal.show();
+        const form = document.querySelector("form");
+        if (form) form.reset();
+        setTimeout(() => {
+          window.location.href = "login.php";
+        }, 4000);
+      });
+    </script>
+
+  <?php endif; ?>
 
 
   <footer class="footer bg-light border-top mt-5 py-4">
@@ -230,4 +233,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

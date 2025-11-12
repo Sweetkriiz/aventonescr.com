@@ -9,12 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idVehiculo = $_POST['id'] ?? null;
     $accion = $_POST['accion'] ?? null;
 
-    if ($accion === 'aprobar' && $idVehiculo) {
+        if ($accion === 'aprobar' && $idVehiculo) {
         $stmt = $pdo->prepare("
             UPDATE vehiculos 
             SET estado = 'aprobado', 
                 motivoRechazo = NULL,
-                leido = 0
+                leido = 1 -- ya leído, no hay notificación pendiente
             WHERE idVehiculo = ?
         ");
         $stmt->execute([$idVehiculo]);

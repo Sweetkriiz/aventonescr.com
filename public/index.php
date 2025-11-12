@@ -8,6 +8,7 @@ include('includes/navbar.php');
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +29,7 @@ include('includes/navbar.php');
 
   <!-- Sección principal con imagen fija -->
   <section class="position-relative">
-<img src="images/Banner1.jpg" alt="Aventones" class="banner w-100">
+    <img src="images/Banner1.jpg" alt="Aventones" class="banner w-100">
 
     <!-- FRASE EN LA ESQUINA DERECHA -->
     <div class="position-absolute text-end" style="top: 120px; right: 40px; z-index: 20;">
@@ -42,7 +43,7 @@ include('includes/navbar.php');
 
     <!-- FORMULARIO flotante sobre la imagen -->
     <div class="position-absolute start-50 translate-middle-x bottom-0 mb-5 w-75 form-glass">
-       <form id="buscarViajeForm" class="row g-3 justify-content-center">
+      <form id="buscarViajeForm" class="row g-3 justify-content-center">
         <div class="col-md-3">
           <label for="origen" class="form-label">Origen</label>
           <input type="text" class="form-control" id="origen" placeholder="Ej. San José" required>
@@ -66,9 +67,36 @@ include('includes/navbar.php');
     </div>
   </section>
 
-   <?php
+
+  <?php
+  if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("
+            SELECT marca, modelo 
+            FROM vehiculos 
+            WHERE idChofer = ? AND estado = 'rechazado' AND leido = 0
+            LIMIT 1
+        ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $v = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($v) {
+      echo "
+            <div class='alert alert-warning d-flex align-items-center shadow-sm border-0 rounded-3 mt-3 mx-auto' role='alert' style='max-width: 700px;'>
+                <i class='bi bi-exclamation-triangle-fill me-2 fs-5'></i>
+                <div class='flex-grow-1 text-start'>
+                    Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>rechazado</b>.
+                    <a href='dashboard_pasajero.php' class='alert-link'>Ver detalles</a>.
+                </div>
+            </div>
+            ";
+    }
+  }
+  ?>
+
+
+  <?php
   // --- Mostrar los últimos viajes publicados ---
-  
+
   // Recupera los tres viajes más recientes activos desde la base de datos
   $ultimosViajes = $pdo->query("
       SELECT nombreViaje, origen, destino, fecha, tarifa 
@@ -81,28 +109,28 @@ include('includes/navbar.php');
   // Si hay resultados, los muestra en tarjetas (cards)
   if ($ultimosViajes):
   ?>
-  <section class="container my-5">
-    <h3 class="fw-bold text-dark text-center mb-4"> Últimos viajes publicados</h3>
-    <div class="row justify-content-center">
-      <?php foreach ($ultimosViajes as $v): ?>
-        <div class="col-md-3">
-          <div class="card border-0 shadow-sm mb-3">
-            <div class="card-body text-center">
-              <h5 class="fw-bold text-success"><?= htmlspecialchars($v['nombreViaje']) ?></h5>
-              <p class="mb-0"><?= htmlspecialchars($v['origen']) ?> → <?= htmlspecialchars($v['destino']) ?></p>
-              <small><?= htmlspecialchars($v['fecha']) ?></small>
-              <p class="fw-bold mt-2">₡<?= number_format($v['tarifa'], 2) ?></p>
-              <a href="resultados.php?origen=<?= urlencode($v['origen']) ?>&destino=<?= urlencode($v['destino']) ?>&fecha=<?= urlencode($v['fecha']) ?>&pasajeros=1" 
-                class="btn btn-outline-success btn-sm mt-2 w-100">
-                Ver detalles
-              </a>
+    <section class="container my-5">
+      <h3 class="fw-bold text-dark text-center mb-4"> Últimos viajes publicados</h3>
+      <div class="row justify-content-center">
+        <?php foreach ($ultimosViajes as $v): ?>
+          <div class="col-md-3">
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body text-center">
+                <h5 class="fw-bold text-success"><?= htmlspecialchars($v['nombreViaje']) ?></h5>
+                <p class="mb-0"><?= htmlspecialchars($v['origen']) ?> → <?= htmlspecialchars($v['destino']) ?></p>
+                <small><?= htmlspecialchars($v['fecha']) ?></small>
+                <p class="fw-bold mt-2">₡<?= number_format($v['tarifa'], 2) ?></p>
+                <a href="resultados.php?origen=<?= urlencode($v['origen']) ?>&destino=<?= urlencode($v['destino']) ?>&fecha=<?= urlencode($v['fecha']) ?>&pasajeros=1"
+                  class="btn btn-outline-success btn-sm mt-2 w-100">
+                  Ver detalles
+                </a>
 
+              </div>
             </div>
           </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-  </section>
+        <?php endforeach; ?>
+      </div>
+    </section>
   <?php endif; ?>
 
   <!-- SECCIÓN 3 PASOS -->
@@ -128,58 +156,58 @@ include('includes/navbar.php');
   </section>
 
   <!-- Script que maneja la búsqueda de viajes -->
-   <script>
-  
-  // Maneja el envío del formulario de búsqueda
-  document.getElementById("buscarViajeForm").addEventListener("submit", function(e) {
-    e.preventDefault(); // evita que recargue la página
-    
-    // Captura los valores ingresados
-    const origen = document.getElementById("origen");
-    const destino = document.getElementById("destino");
-    const fecha = document.getElementById("fecha");
-    const pasajeros = document.getElementById("pasajeros");
+  <script>
+    // Maneja el envío del formulario de búsqueda
+    document.getElementById("buscarViajeForm").addEventListener("submit", function(e) {
+      e.preventDefault(); // evita que recargue la página
 
-    fetch("buscar_viaje.php", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        origen: origen.value.trim(),
-        destino: destino.value.trim(),
-        fecha: fecha.value,
-        pasajeros: pasajeros.value
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
+      // Captura los valores ingresados
+      const origen = document.getElementById("origen");
+      const destino = document.getElementById("destino");
+      const fecha = document.getElementById("fecha");
+      const pasajeros = document.getElementById("pasajeros");
 
-      // Independientemente del resultado, redirige a la página de resultados
-      if (data.status === "ok" || data.status === "no_results") {
-        // Redirige siempre a resultados.php (maneja ambos casos)
-        window.location.href =
-          "resultados.php?origen=" + encodeURIComponent(origen.value) +
-          "&destino=" + encodeURIComponent(destino.value) +
-          "&fecha=" + encodeURIComponent(fecha.value) +
-          "&pasajeros=" + encodeURIComponent(pasajeros.value);
-      }
-    })
-    .catch(() => alert("Ocurrió un error al buscar viajes."));
-  });
+      fetch("buscar_viaje.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            origen: origen.value.trim(),
+            destino: destino.value.trim(),
+            fecha: fecha.value,
+            pasajeros: pasajeros.value
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+
+          // Independientemente del resultado, redirige a la página de resultados
+          if (data.status === "ok" || data.status === "no_results") {
+            // Redirige siempre a resultados.php (maneja ambos casos)
+            window.location.href =
+              "resultados.php?origen=" + encodeURIComponent(origen.value) +
+              "&destino=" + encodeURIComponent(destino.value) +
+              "&fecha=" + encodeURIComponent(fecha.value) +
+              "&pasajeros=" + encodeURIComponent(pasajeros.value);
+          }
+        })
+        .catch(() => alert("Ocurrió un error al buscar viajes."));
+    });
   </script>
 
-<script>
-  
-  // Bloquea la selección de fechas anteriores al día actual
-  document.addEventListener("DOMContentLoaded", () => {
-    const inputFecha = document.getElementById("fecha");
-    const hoy = new Date();
-    const yyyy = hoy.getFullYear();
-    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
-    const dd = String(hoy.getDate()).padStart(2, "0");
-    const fechaMinima = `${yyyy}-${mm}-${dd}`;
-    inputFecha.setAttribute("min", fechaMinima);
-  });
-</script>
+  <script>
+    // Bloquea la selección de fechas anteriores al día actual
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputFecha = document.getElementById("fecha");
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+      const dd = String(hoy.getDate()).padStart(2, "0");
+      const fechaMinima = `${yyyy}-${mm}-${dd}`;
+      inputFecha.setAttribute("min", fechaMinima);
+    });
+  </script>
 
   <!-- Footer -->
   <footer class="text-center py-3 bg-dark text-white">
@@ -187,4 +215,5 @@ include('includes/navbar.php');
   </footer>
 
 </body>
+
 </html>

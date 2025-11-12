@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../../config/funciones_ride.php';
-include '../includes/navbar.php'; 
+include '../includes/navbar.php';
 
 // Obtiene el ID del viaje desde la URL (parámetro GET) y lo convierte a entero
 // Y busca el viaje en la base de datos con el ID recibido
@@ -37,10 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <title>Editar Ride</title>
-  
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
@@ -48,23 +49,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 </head>
-<body class="bg-light">
-<div class="container py-5">
-  <h2 class="text-success mb-4">Editar Ride</h2>
-  <?= $error ?? '' ?>
 
-  <!-- Formulario con los datos del ride precargados -->
-  <form method="POST">
-    <div class="mb-3"><label>Origen</label><input type="text" name="origen" value="<?= htmlspecialchars($viaje['origen']) ?>" class="form-control" required></div>
-    <div class="mb-3"><label>Destino</label><input type="text" name="destino" value="<?= htmlspecialchars($viaje['destino']) ?>" class="form-control" required></div>
-    <div class="mb-3"><label>Fecha</label><input type="date" name="fecha" value="<?= htmlspecialchars($viaje['fecha']) ?>" class="form-control" required></div>
-    <div class="mb-3"><label>Hora de salida</label><input type="time" name="horaSalida" value="<?= htmlspecialchars($viaje['horaSalida']) ?>" class="form-control" required></div>
-    <div class="mb-3"><label>Hora de llegada</label><input type="time" name="horaLlegada" value="<?= htmlspecialchars($viaje['horaLlegada']) ?>" class="form-control" required></div>
-    <div class="mb-3"><label>Tarifa (₡)</label><input type="number" step="0.01" name="tarifa" value="<?= htmlspecialchars($viaje['tarifa']) ?>" class="form-control" required></div>
-    <div class="mb-3"><label>Espacios disponibles</label><input type="number" name="espaciosDisponibles" value="<?= htmlspecialchars($viaje['espaciosDisponibles']) ?>" class="form-control" required></div>
-    <button type="submit" class="btn btn-success">Guardar cambios</button>
-    <a href="listar_ride.php" class="btn btn-secondary">Cancelar</a>
-  </form>
-</div>
+<body class="bg-light">
+  <div class="container py-5">
+    <h2 class="text-success mb-4">Editar Ride</h2>
+    <?= $error ?? '' ?>
+
+    <!-- Formulario con los datos del ride precargados -->
+    <form method="POST">
+      <div class="mb-3"><label>Origen</label><input type="text" name="origen" value="<?= htmlspecialchars($viaje['origen']) ?>" class="form-control" required></div>
+      <div class="mb-3"><label>Destino</label><input type="text" name="destino" value="<?= htmlspecialchars($viaje['destino']) ?>" class="form-control" required></div>
+      <div class="mb-3"><label>Fecha</label><input type="date" name="fecha" value="<?= htmlspecialchars($viaje['fecha']) ?>" class="form-control" required></div>
+      <div class="mb-3"><label>Hora de salida</label><input type="time" name="horaSalida" value="<?= htmlspecialchars($viaje['horaSalida']) ?>" class="form-control" required></div>
+      <div class="mb-3"><label>Hora de llegada</label><input type="time" name="horaLlegada" value="<?= htmlspecialchars($viaje['horaLlegada']) ?>" class="form-control" required></div>
+      <div class="mb-3"><label>Tarifa (₡)</label><input type="number" step="0.01" name="tarifa" value="<?= htmlspecialchars($viaje['tarifa']) ?>" class="form-control" required></div>
+      <div class="mb-3"><label>Espacios disponibles</label><input type="number" name="espaciosDisponibles" value="<?= htmlspecialchars($viaje['espaciosDisponibles']) ?>" class="form-control" required></div>
+      <button type="submit" class="btn btn-success">Guardar cambios</button>
+      <a href="listar_ride.php" class="btn btn-secondary">Cancelar</a>
+    </form>
+  </div>
 </body>
+
 </html>

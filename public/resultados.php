@@ -34,6 +34,7 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,9 +49,10 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
     /* Pequeñas mejoras visuales */
     .hover-shadow:hover {
       transform: translateY(-3px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
       transition: all 0.3s ease;
     }
+
     .card {
       border-radius: 15px;
     }
@@ -76,7 +78,7 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="card border-0 shadow-sm h-100 rounded-4 hover-shadow">
               <div class="card-body">
                 <h5 class="fw-bold text-dark mb-3">
-                  <?= htmlspecialchars($viaje['nombreViaje']) ?> 
+                  <?= htmlspecialchars($viaje['nombreViaje']) ?>
                   <span class="text-success">- <?= htmlspecialchars($viaje['fecha']) ?></span>
                 </h5>
                 <p class="mb-1"><strong>Chofer:</strong> <?= htmlspecialchars($viaje['chofer_nombre']) ?></p>
@@ -88,17 +90,17 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <!-- Botón de acción -->
                 <?php if (isset($_SESSION['user_id'])): ?>
-                  <button class="btn btn-success w-100 btn-reservar" 
-                          data-id="<?= $viaje['idViaje'] ?>" 
-                          data-nombre="<?= htmlspecialchars($viaje['nombreViaje']) ?>"
-                          data-chofer="<?= htmlspecialchars($viaje['chofer_nombre']) ?>"
-                          data-origen="<?= htmlspecialchars($viaje['origen']) ?>"
-                          data-hsalida="<?= htmlspecialchars($viaje['horaSalida']) ?>"
-                          data-destino="<?= htmlspecialchars($viaje['destino']) ?>"
-                          data-hllegada="<?= htmlspecialchars($viaje['horaLlegada']) ?>"
-                          data-fecha="<?= htmlspecialchars($viaje['fecha']) ?>"
-                          data-tarifa="<?= htmlspecialchars($viaje['tarifa']) ?>"
-                          data-espacios="<?= htmlspecialchars($viaje['espaciosDisponibles']) ?>">
+                  <button class="btn btn-success w-100 btn-reservar"
+                    data-id="<?= $viaje['idViaje'] ?>"
+                    data-nombre="<?= htmlspecialchars($viaje['nombreViaje']) ?>"
+                    data-chofer="<?= htmlspecialchars($viaje['chofer_nombre']) ?>"
+                    data-origen="<?= htmlspecialchars($viaje['origen']) ?>"
+                    data-hsalida="<?= htmlspecialchars($viaje['horaSalida']) ?>"
+                    data-destino="<?= htmlspecialchars($viaje['destino']) ?>"
+                    data-hllegada="<?= htmlspecialchars($viaje['horaLlegada']) ?>"
+                    data-fecha="<?= htmlspecialchars($viaje['fecha']) ?>"
+                    data-tarifa="<?= htmlspecialchars($viaje['tarifa']) ?>"
+                    data-espacios="<?= htmlspecialchars($viaje['espaciosDisponibles']) ?>">
                     Reservar cupo
                   </button>
                 <?php else: ?>
@@ -156,4 +158,61 @@ $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <script>
     const modalEl = document.getElementById("modalReserva");
-    const modal =
+    const modal = new bootstrap.Modal(modalEl);
+
+    let idViajeActual = null;
+
+    document.querySelectorAll(".btn-reservar").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        idViajeActual = btn.dataset.id;
+        document.getElementById("res-nombre").textContent = btn.dataset.nombre;
+        document.getElementById("res-chofer").textContent = btn.dataset.chofer;
+        document.getElementById("res-origen").textContent = btn.dataset.origen;
+        document.getElementById("res-hsalida").textContent = btn.dataset.hsalida;
+        document.getElementById("res-destino").textContent = btn.dataset.destino;
+        document.getElementById("res-hllegada").textContent = btn.dataset.hllegada;
+        document.getElementById("res-fecha").textContent = btn.dataset.fecha;
+        document.getElementById("res-tarifa").textContent = btn.dataset.tarifa;
+        document.getElementById("res-espacios").textContent = btn.dataset.espacios;
+        const msg = document.getElementById("mensaje-reserva");
+        msg.className = "alert d-none mt-3";
+        document.getElementById("btn-confirmar").disabled = false;
+        modal.show();
+      });
+    });
+
+    document.getElementById("btn-confirmar").addEventListener("click", () => {
+      fetch("reservar.php", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: "idViaje=" + encodeURIComponent(idViajeActual)
+        })
+        .then(r => r.json())
+        .then(data => {
+          const msg = document.getElementById("mensaje-reserva");
+          msg.classList.remove("d-none", "alert-success", "alert-danger");
+          msg.classList.add(data.status === "ok" ? "alert-success" : "alert-danger");
+          msg.textContent = data.mensaje;
+
+          if (data.status === "ok") {
+            document.getElementById("btn-confirmar").disabled = true;
+            setTimeout(() => {
+              modal.hide();
+              location.reload();
+            }, 1800);
+          }
+        })
+        .catch(() => {
+          const msg = document.getElementById("mensaje-reserva");
+          msg.classList.remove("d-none");
+          msg.classList.add("alert-danger");
+          msg.textContent = "Error al conectar con el servidor.";
+        });
+    });
+  </script>
+</body>
+
+</html>

@@ -10,50 +10,51 @@ $stmt->execute([$idUsuario]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nombre = $_POST['nombre'] ?? '';
-    $apellidos = $_POST['apellidos'] ?? '';
-    $correo = $_POST['correo'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
-    $fechaNacimiento = $_POST['fechaNacimiento'] ?? '';
-    $passwordActual = $_POST['passwordActual'] ?? '';
-    $passwordNueva = $_POST['passwordNueva'] ?? '';
-    $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
+  $nombre = $_POST['nombre'] ?? '';
+  $apellidos = $_POST['apellidos'] ?? '';
+  $correo = $_POST['correo'] ?? '';
+  $telefono = $_POST['telefono'] ?? '';
+  $fechaNacimiento = $_POST['fechaNacimiento'] ?? '';
+  $passwordActual = $_POST['passwordActual'] ?? '';
+  $passwordNueva = $_POST['passwordNueva'] ?? '';
+  $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
 
-    // Valida si se desea cambiar la contraseña
-    if (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar)) {
-        // Obtener contraseña actual del usuario
-        $stmtPass = $pdo->prepare("SELECT contrasena FROM usuarios WHERE idUsuario = ?");
-        $stmtPass->execute([$idUsuario]);
-        $actual = $stmtPass->fetchColumn();
+  // Valida si se desea cambiar la contraseña
+  if (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar)) {
+    // Obtener contraseña actual del usuario
+    $stmtPass = $pdo->prepare("SELECT contrasena FROM usuarios WHERE idUsuario = ?");
+    $stmtPass->execute([$idUsuario]);
+    $actual = $stmtPass->fetchColumn();
 
-        // Validaciones de contraseña
-        if (hash('sha256', $passwordActual) !== $actual) {
-            $error = "La contraseña actual no es correcta.";
-        } elseif ($passwordNueva !== $passwordConfirmar) {
-            $error = "Las contraseñas nuevas no coinciden.";
-        } elseif (strlen($passwordNueva) < 8) {
-            $error = "La nueva contraseña debe tener al menos 8 caracteres.";
-        } elseif (hash('sha256', $passwordNueva) === $actual) {
-            $error = "La nueva contraseña no puede ser igual a la actual.";
-        } else {
-            // Actualizar contraseña con hash SHA-256
-            $hashed = hash('sha256', $passwordNueva);
-            $stmt = $pdo->prepare("UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?");
-            $stmt->execute([$hashed, $idUsuario]);
-            $success = "Contraseña actualizada correctamente.";
-        }
+    // Validaciones de contraseña
+    if (hash('sha256', $passwordActual) !== $actual) {
+      $error = "La contraseña actual no es correcta.";
+    } elseif ($passwordNueva !== $passwordConfirmar) {
+      $error = "Las contraseñas nuevas no coinciden.";
+    } elseif (strlen($passwordNueva) < 8) {
+      $error = "La nueva contraseña debe tener al menos 8 caracteres.";
+    } elseif (hash('sha256', $passwordNueva) === $actual) {
+      $error = "La nueva contraseña no puede ser igual a la actual.";
+    } else {
+      // Actualizar contraseña con hash SHA-256
+      $hashed = hash('sha256', $passwordNueva);
+      $stmt = $pdo->prepare("UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?");
+      $stmt->execute([$hashed, $idUsuario]);
+      $success = "Contraseña actualizada correctamente.";
     }
+  }
 
-    // Actualizar otros datos
-    $stmt = $pdo->prepare("UPDATE usuarios 
+  // Actualizar otros datos
+  $stmt = $pdo->prepare("UPDATE usuarios 
                            SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, fechaNacimiento = ? 
                            WHERE idUsuario = ?");
-    $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
+  $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -159,22 +160,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <?php if (isset($success)): ?>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
-      modal.show();
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+        modal.show();
 
-      // Redirigir automáticamente después de 5s
-      setTimeout(() => {
-        window.location.href = "miPerfil.php";
-      }, 5000);
+        // Redirigir automáticamente después de 5s
+        setTimeout(() => {
+          window.location.href = "miPerfil.php";
+        }, 5000);
 
-      // O de inmediato si presiona el botón
-      document.getElementById('btnIrPerfil').addEventListener('click', function() {
-        window.location.href = "miPerfil.php";
+        // O de inmediato si presiona el botón
+        document.getElementById('btnIrPerfil').addEventListener('click', function() {
+          window.location.href = "miPerfil.php";
+        });
       });
-    });
-  </script>
+    </script>
   <?php endif; ?>
 </body>
+
 </html>
