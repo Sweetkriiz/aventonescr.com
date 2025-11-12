@@ -1,7 +1,6 @@
- <?php
+<?php
 session_start();
 include('includes/navbar.php');
-
 require_once '../config/database.php';
 
 // Obtener datos del usuario
@@ -9,41 +8,8 @@ $idUsuario = $_SESSION['user_id'];
 $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE idUsuario = ?");
 $stmt->execute([$idUsuario]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// --- SUBIR FOTO ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['fotografia'])) {
-    $foto = $_FILES['fotografia'];
-
-    if (!empty($foto['name']) && $foto['error'] === UPLOAD_ERR_OK) {
-        $extension = strtolower(pathinfo($foto['name'], PATHINFO_EXTENSION));
-        $permitidas = ['jpg', 'jpeg', 'png', 'gif'];
-
-        if (in_array($extension, $permitidas)) {
-            $nombre = uniqid('perfil_') . '.' . $extension;
-            $directorio = "uploads/perfiles/"; // dentro del proyecto
-            $destino = $directorio . $nombre;
-
-            if (!is_dir($directorio)) {
-                mkdir($directorio, 0755, true);
-            }
-
-            // Eliminar la anterior si existe
-            if (!empty($usuario['fotografia']) && file_exists($directorio . $usuario['fotografia'])) {
-                unlink($directorio . $usuario['fotografia']);
-            }
-
-            if (move_uploaded_file($foto['tmp_name'], $destino)) {
-                $stmt = $pdo->prepare("UPDATE usuarios SET fotografia = ? WHERE idUsuario = ?");
-                $stmt->execute([$nombre, $idUsuario]);
-                header("Location: miPerfil.php");
-                exit;
-            }
-        }
-    }
-}
-
-
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -54,32 +20,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['fotografia'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/miPerfil.css">
-</head>
 
+</head>
 
 <body>
   <div class="container py-5">
-    <div class="card mx-auto" style="max-width: 850px;">
+    <div class="card mx-auto shadow-sm" style="max-width: 850px; border-radius: 1rem;">
       
       <div class="profile-header">
-  <form id="formFoto" enctype="multipart/form-data" method="POST">
-    <label for="fotoPerfil" class="foto-perfil">
-      <img id="previewFoto"
-     src="<?= !empty($usuario['fotografia']) 
-              ? 'public/uploads/perfiles/' . htmlspecialchars($usuario['fotografia']) 
-              : 'images/avatar_default.png' ?>"
-     alt="Foto de perfil">
+        <div class="profile-icon">
+          <i class="bi bi-person-circle"></i>
+        </div>
 
+        <h3 class="fw-bold"><?= htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']) ?></h3>
+        <span class="badge bg-light text-success fw-semibold"><?= ucfirst($usuario['rol']) ?></span>
+      </div>
 
-      <div class="overlay"><i class="bi bi-camera"></i></div>
-    </label>
-    <input type="file" id="fotoPerfil" name="fotografia" accept="image/*" hidden>
-  </form>
-
-  <h3><?= htmlspecialchars($usuario['nombre'] . ' ' . $usuario['apellidos']) ?></h3>
-  <span class="badge bg-light text-success fw-semibold"><?= ucfirst($usuario['rol']) ?></span>
-</div>
-      <div class="profile-body">
+      <div class="profile-body px-4 pb-4">
         <div class="row mb-3">
           <div class="col-md-6">
             <p class="info-label"><i class="bi bi-person-badge"></i> Nombre de usuario:</p>
@@ -125,25 +82,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['fotografia'])) {
     </div>
   </div>
 
-  <footer class="text-center py-3 text-white mt-5" style="background-color: #198754;">
-    © 2025 Aventones CR | Mi Perfil
+  <footer class="text-center py-3 bg-dark text-white mt-5">
+    © 2025 Aventones CR | Panel del Administrador
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    const inputFoto = document.getElementById("fotografia");
-    const preview = document.getElementById("previewFoto");
-    const formFoto = document.getElementById("formFoto");
-
-    inputFoto.addEventListener("change", function() {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => preview.src = e.target.result;
-        reader.readAsDataURL(file);
-        formFoto.submit(); // envía automáticamente
-      }
-    });
-  </script>
 </body>
 </html>

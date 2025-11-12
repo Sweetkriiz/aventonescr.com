@@ -4,7 +4,6 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/funciones_admin.php';
 include('includes/navbar.php');
 
-
 // --- Procesar aprobación o rechazo ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idVehiculo = $_POST['id'] ?? null;
@@ -19,6 +18,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             WHERE idVehiculo = ?
         ");
         $stmt->execute([$idVehiculo]);
+
+        // --- Cambiar rol a chofer si aplica ---
+        $stmtChofer = $pdo->prepare("SELECT idChofer FROM vehiculos WHERE idVehiculo = ?");
+        $stmtChofer->execute([$idVehiculo]);
+        $idChofer = $stmtChofer->fetchColumn();
+
+        if ($idChofer) {
+            $stmtRol = $pdo->prepare("SELECT rol FROM usuarios WHERE idUsuario = ?");
+            $stmtRol->execute([$idChofer]);
+            $rolActual = $stmtRol->fetchColumn();
+
+            if ($rolActual === 'pasajero') {
+                $stmtUpdateRol = $pdo->prepare("UPDATE usuarios SET rol = 'chofer' WHERE idUsuario = ?");
+                $stmtUpdateRol->execute([$idChofer]);
+            }
+        }
+
         $_SESSION['mensaje'] = "Vehículo aprobado correctamente.";
         header("Location: procesarSolicitudes.php");
         exit();
@@ -60,6 +76,7 @@ if (!empty($busqueda)) {
             v.placa,
             v.fotografia,
             v.estado,
+            v.motivoRechazo,
             u.nombreUsuario,
             CONCAT(u.nombre, ' ', u.apellidos) AS nombreCompleto
         FROM vehiculos v
@@ -74,7 +91,6 @@ if (!empty($busqueda)) {
     $stmt->execute();
     $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    // Mostrar solo los pendientes si no hay búsqueda
     $stmt = $pdo->query("
         SELECT 
             v.idVehiculo AS id,
@@ -85,17 +101,17 @@ if (!empty($busqueda)) {
             v.placa,
             v.fotografia,
             v.estado,
+            v.motivoRechazo,
             u.nombreUsuario,
             CONCAT(u.nombre, ' ', u.apellidos) AS nombreCompleto
         FROM vehiculos v
         INNER JOIN usuarios u ON v.idChofer = u.idUsuario
-        WHERE v.estado = 'pendiente'
+        WHERE v.estado IN ('pendiente','rechazado','aprobado')
         ORDER BY v.idVehiculo DESC
     ");
     $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="es">
@@ -148,13 +164,8 @@ if (!empty($busqueda)) {
     </div>
 
   <?php if (empty($vehiculosPendientes)): ?>
-  <?php if (!empty($busqueda)): ?>
-    <div class="alert alert-info text-center">No se encontraron vehículos para “<?= htmlspecialchars($busqueda) ?>”.</div>
+    <div class="alert alert-info text-center">No se encontraron vehículos.</div>
   <?php else: ?>
-    <div class="alert alert-info text-center">No hay solicitudes pendientes por procesar.</div>
-  <?php endif; ?>
-  <?php else: ?>
-
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php foreach ($vehiculosPendientes as $vehiculo): ?>
           <div class="col">
@@ -182,6 +193,13 @@ if (!empty($busqueda)) {
                   </span>
                 </p>
 
+                <!-- ✅ Mostrar motivo de rechazo si aplica -->
+                <?php if ($vehiculo['estado'] === 'rechazado' && !empty($vehiculo['motivoRechazo'])): ?>
+                  <p class="card-text text-muted small mb-3">
+                    <strong>Motivo:</strong> <?= htmlspecialchars($vehiculo['motivoRechazo']) ?>
+                  </p>
+                <?php endif; ?>
+
                 <!-- Formulario de aprobación -->
                 <form method="POST" class="d-inline">
                   <input type="hidden" name="id" value="<?= $vehiculo['id'] ?>">
@@ -202,7 +220,7 @@ if (!empty($busqueda)) {
           </div>
         <?php endforeach; ?>
       </div>
-    <?php endif; ?>
+  <?php endif; ?>
   </div>
 
   <!-- Modal de rechazo -->
@@ -226,6 +244,12 @@ if (!empty($busqueda)) {
         </div>
       </form>
     </div>
+  </div>
+
+  <div class="mt-1 d-flex justify-content-center">
+    <a href="../dashboard_admin.php" class="btn btn-success">
+      <i class="bi bi-arrow-left-circle me-2"></i> Volver al Panel
+    </a>
   </div>
 
   <footer class="text-center py-3 bg-dark text-white mt-5">
