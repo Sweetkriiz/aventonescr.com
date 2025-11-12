@@ -60,7 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Insertar usuario
   if (empty($errores)) {
     try {
-      $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+      // Usar SHA-256 en lugar de password_hash()
+      $hashedPassword = hash('sha256', $password);
+
       $sql = "INSERT INTO Usuarios 
               (nombre, apellidos, cedula, fechaNacimiento, nombreUsuario, correo, contrasena, telefono, rol)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -70,33 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombreUsuario, $correo, $hashedPassword, $telefono, $rol
       ]);
 
-      // REVISAR LO DE LAS FOTOS
-      if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-        $idUsuario = $pdo->lastInsertId();
-        $nombreArchivo = uniqid('foto_') . '.' . pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION);
-        $rutaDestino = "../uploads/" . $nombreArchivo;
-
-        if (!is_dir("../uploads")) {
-          mkdir("../uploads", 0755, true);
-        }
-
-        move_uploaded_file($_FILES['foto']['tmp_name'], $rutaDestino);
-
-        $sqlFoto = "UPDATE Usuarios SET foto = ? WHERE id = ?";
-        $stmtFoto = $pdo->prepare($sqlFoto);
-        $stmtFoto->execute([$nombreArchivo, $idUsuario]);
-      }
-
       $mensaje = "Usuario creado correctamente.";
     } catch (PDOException $e) {
       $errores[] = "Error al registrar el usuario: " . $e->getMessage();
     }
   }
 }
-
-
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
