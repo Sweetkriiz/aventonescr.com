@@ -6,41 +6,39 @@ $mensaje = "";
 $errores = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $nombre = trim($_POST['nombre']);
-  $apellidos = trim($_POST['apellidos']);
-  $cedula = trim($_POST['cedula']);
-  $fechaNacimiento = $_POST['fechaNacimiento'];
-  $nombreUsuario = trim($_POST['nombreUsuario']);
-  $correo = trim($_POST['correo']);
-  $password = $_POST['password'];
-  $confirmar = $_POST['contrasena'];
-  $telefono = trim($_POST['telefono']);
-  $rol = 'pasajero'; // Valor por defecto
+    $nombre = trim($_POST['nombre']);
+    $apellidos = trim($_POST['apellidos']);
+    $cedula = trim($_POST['cedula']);
+    $fechaNacimiento = $_POST['fechaNacimiento'];
+    $nombreUsuario = trim($_POST['nombreUsuario']);
+    $correo = trim($_POST['correo']);
+    $password = $_POST['password'];
+    $confirmar = $_POST['contrasena'];
+    $telefono = trim($_POST['telefono']);
+    $rol = 'pasajero'; // Valor por defecto
 
-  // --- VALIDACIONES BÁSICAS ---
-  if (
-    empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
-    empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)
-  ) {
-    $errores[] = "Todos los campos son obligatorios.";
-  }
+    // Validaciones 
+    if (empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
+        empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)) {
+        $errores[] = "Todos los campos son obligatorios.";
+    }
+      //Válida el formato del correo electrónico
+    if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+        $errores[] = "El correo electrónico no es válido.";
+    }
 
-  if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
-    $errores[] = "El correo electrónico no es válido.";
-  }
+    if ($password !== $confirmar) {
+        $errores[] = "Las contraseñas no coinciden.";
+    }
 
-  if ($password !== $confirmar) {
-    $errores[] = "Las contraseñas no coinciden.";
-  }
+    if (strlen($password) < 8) {
+        $errores[] = "La contraseña debe tener al menos 8 caracteres.";
+    }
 
-  if (strlen($password) < 8) {
-    $errores[] = "La contraseña debe tener al menos 8 caracteres.";
-  }
-
-  // --- VALIDAR DUPLICADOS ---
-  if (empty($errores)) {
-    try {
-      $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
+    // Validación de duplicados
+    if (empty($errores)) {
+        try {
+            $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
                          WHERE correo = ? OR cedula = ? OR telefono = ? OR nombreUsuario = ?";
       $stmtCheck = $pdo->prepare($sqlCheck);
       $stmtCheck->execute([$correo, $cedula, $telefono, $nombreUsuario]);
@@ -192,22 +190,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </div>
-
-  <?php if ($mensaje): ?>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
-        modal.show();
-        const form = document.querySelector("form");
-        if (form) form.reset();
-        setTimeout(() => {
-          window.location.href = "login.php";
-        }, 4000);
-      });
-    </script>
-
-  <?php endif; ?>
-
+</div>
+ 
+<?php if ($mensaje): ?>
+  <!-- Js del modal-->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const modal = new bootstrap.Modal(document.getElementById('registroExitoso'));
+      modal.show();
+      const form = document.querySelector("form");
+      if (form) form.reset();
+      setTimeout(() => {
+        window.location.href = "login.php";
+      }, 4000);
+    });
+  </script>
+  
+<?php endif; ?>
 
   <footer class="footer bg-light border-top mt-5 py-4">
     <div class="container d-flex flex-wrap justify-content-between align-items-center">

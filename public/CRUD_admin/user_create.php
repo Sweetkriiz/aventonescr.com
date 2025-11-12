@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h3 class="text-center fw-bold mb-4 text-success">
           <i class="bi bi-person-plus-fill"></i> Crear nuevo usuario
         </h3>
-
+        <!-- Mensaje de error-->
         <?php if (!empty($errores)): ?>
           <div class="alert alert-danger">
             <ul class="mb-0">
@@ -177,10 +177,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="col-md-6">
               <label class="form-label">Confirmar contraseña</label>
               <input type="password" name="confirmar" class="form-control" required>
-            </div>
-            <div class="col-12">
-              <label class="form-label">Fotografía (opcional)</label>
-              <input type="file" name="foto" class="form-control" accept="image/*">
             </div>
           </div>
 

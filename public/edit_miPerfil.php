@@ -68,13 +68,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
   <div class="container py-5">
     <div class="card mx-auto" style="max-width: 850px;">
-
-      <!-- Encabezado (ahora bien cerrado) -->
       <div class="card-header bg-success text-white text-center">
         <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Editar Perfil</h4>
       </div>
 
-      <!-- Cuerpo del formulario (separado del header) -->
+      <!-- Cuerpo del formulario -->
       <div class="px-3 pb-4 mt-3">
         <?php if (isset($error)): ?>
           <div class="alert alert-danger text-center"><?= $error ?></div>
@@ -160,20 +158,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <?php if (isset($success)): ?>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
-        modal.show();
+    
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+      modal.show();
 
-        // Redirigir automáticamente después de 5s
-        setTimeout(() => {
-          window.location.href = "miPerfil.php";
-        }, 5000);
+      // Redirigir automáticamente después de 5s
+      setTimeout(() => {
+        window.location.href = "miPerfil.php";
+      }, 5000);
 
-        // O de inmediato si presiona el botón
-        document.getElementById('btnIrPerfil').addEventListener('click', function() {
-          window.location.href = "miPerfil.php";
-        });
+      // O de inmediato si presiona el botón
+      document.getElementById('btnIrPerfil').addEventListener('click', function() {
+        window.location.href = "miPerfil.php";
       });
     </script>
   <?php endif; ?>
