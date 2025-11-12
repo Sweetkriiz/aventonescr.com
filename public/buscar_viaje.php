@@ -78,7 +78,6 @@ try {
         // No hay resultados, pero seguimos el flujo normal
         echo json_encode(["status" => "no_results"]);
     }
-
 } catch (PDOException $e) {
     // Manejo de error interno (evita exponer detalles al usuario)
     error_log("Error en buscar_viaje.php: " . $e->getMessage());
@@ -87,4 +86,3 @@ try {
         "message" => "Error al realizar la búsqueda en la base de datos."
     ]);
 }
-?>

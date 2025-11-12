@@ -13,4 +13,3 @@ if (deleteViaje($idViaje)) {
 } else {
   echo "<div class='alert alert-danger text-center mt-5'>Error al eliminar el ride.</div>";
 }
-?>

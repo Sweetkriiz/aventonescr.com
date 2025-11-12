@@ -24,7 +24,7 @@ if ($vehiculo['idChofer'] !== ($_SESSION['user_id'] ?? null)) {
 
 // Si existe el vehículo y la función de eliminación se ejecuta correctamente
 if (deleteVehiculo($idVehiculo)) {
-    
+
     // Define la ruta absoluta hacia la carpeta /uploads/
     $directorio = __DIR__ . '/../uploads/';
     $rutaArchivo = $directorio . $vehiculo['fotografia'];
@@ -36,7 +36,6 @@ if (deleteVehiculo($idVehiculo)) {
 
     // Mensaje de confirmación
     $_SESSION['success'] = "Vehículo y su fotografía fueron eliminados correctamente.";
-
 } else {
     // Si falla la eliminación en base de datos
     $_SESSION['error'] = "Error al eliminar el vehículo.";
@@ -45,4 +44,3 @@ if (deleteVehiculo($idVehiculo)) {
 // Redirige de vuelta al listado de vehículos
 header('Location: listar_vehiculo.php');
 exit();
-?>

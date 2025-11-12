@@ -55,14 +55,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Si no hay errores, intenta crear el vehículo en la base de datos
     if (empty($errors)) {
-        if (createVehiculo($idChofer, $marca, $modelo, $anio, $color, $placa, $fotoNombre)) {
-            $_SESSION['success'] = " Vehículo agregado correctamente. Pendiente de aprobación.";
+        $resultado = createVehiculo($idChofer, $marca, $modelo, $anio, $color, $placa, $fotoNombre);
+
+        if ($resultado === true) {
+            $_SESSION['success'] = "Vehículo agregado correctamente. Pendiente de aprobación.";
             header("Location: listar_vehiculo.php");
             exit();
         } else {
-            $errors[] = "Error al agregar el vehículo.";
+            // Si la función devuelve un mensaje (como placa duplicada), lo agregamos al array de errores
+            $errors[] = $resultado;
         }
     }
+
 }
 ?>
 <!DOCTYPE html>
@@ -84,14 +88,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Mensajes de error -->
     <?php if (!empty($errors)): ?>
-        <div class="alert alert-danger">
-            <ul class="mb-0">
+    <div class="alert alert-warning d-flex align-items-center shadow-sm border-0 rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+            <div>
                 <?php foreach ($errors as $e): ?>
-                    <li><?= htmlspecialchars($e) ?></li>
+                    <div><?= htmlspecialchars($e) ?></div>
                 <?php endforeach; ?>
-            </ul>
+            </div>
         </div>
     <?php endif; ?>
+
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="alert alert-success d-flex align-items-center shadow-sm border-0 rounded-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+            <div><?= $_SESSION['success']; unset($_SESSION['success']); ?></div>
+        </div>
+    <?php endif; ?>
+
 
     <!-- Formulario de creación de vehículo -->                    
     <form method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm bg-white border-0 rounded-3">
