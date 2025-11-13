@@ -10,6 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $apellidos = trim($_POST['apellidos']);
     $cedula = trim($_POST['cedula']);
     $fechaNacimiento = $_POST['fechaNacimiento'];
+
+    //valida el formato de la fecha de nacimiento
+    $componentesFecha = explode('-', $fechaNacimiento);
+    if (count($componentesFecha) !== 3 || !checkdate((int)$componentesFecha[1], (int)$componentesFecha[2], (int)$componentesFecha[0])) {
+        $errores[] = "Ingrese una fecha de nacimiento válida.";
+    }
     $nombreUsuario = trim($_POST['nombreUsuario']);
     $correo = trim($_POST['correo']);
     $password = $_POST['password'];
@@ -22,7 +28,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)) {
         $errores[] = "Todos los campos son obligatorios.";
     }
-      //Válida el formato del correo electrónico
+
+    // Validar formato telefonico  (Costa Rica = 8 dígitos)
+    if (!preg_match('/^[0-9]{8}$/', $telefono)) {
+        $errores[] = "El número de teléfono debe tener exactamente 8 dígitos y ser numérico.";
+    }
+
+    // Validar edad (mínimo 18 años)
+    $fechaMinima = date('Y-m-d', strtotime('-18 years'));
+    $fechaActual = date('Y-m-d');
+
+    if ($fechaNacimiento > $fechaActual) {
+        $errores[] = "La fecha de nacimiento no puede ser en el futuro.";
+    } elseif ($fechaNacimiento > $fechaMinima) {
+        $errores[] = "Debes tener al menos 18 años para registrarte.";
+    }
+
+    // Válida el formato del correo electrónico
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
         $errores[] = "El correo electrónico no es válido.";
     }
@@ -40,35 +62,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
                          WHERE correo = ? OR cedula = ? OR telefono = ? OR nombreUsuario = ?";
-      $stmtCheck = $pdo->prepare($sqlCheck);
-      $stmtCheck->execute([$correo, $cedula, $telefono, $nombreUsuario]);
-      $existe = $stmtCheck->fetchColumn();
+            $stmtCheck = $pdo->prepare($sqlCheck);
+            $stmtCheck->execute([$correo, $cedula, $telefono, $nombreUsuario]);
+            $existe = $stmtCheck->fetchColumn();
 
-      if ($existe > 0) {
-        $errores[] = "El correo, cédula, teléfono o nombre de usuario ya están registrados.";
-      }
-    } catch (PDOException $e) {
-      $errores[] = "Error al verificar duplicados: " . $e->getMessage();
+            if ($existe > 0) {
+                $errores[] = "El correo, cédula, teléfono o nombre de usuario ya están registrados.";
+            }
+        } catch (PDOException $e) {
+            $errores[] = "Error al verificar duplicados: " . $e->getMessage();
+        }
     }
-  }
 
+    if (empty($errores)) {
+        try {
+            // Hashear con SHA-256 
+            $hashedPassword = hash('sha256', $password);
 
-  if (empty($errores)) {
-    try {
-      // Hashear con SHA-256 
-      $hashedPassword = hash('sha256', $password);
+            $sql = "INSERT INTO Usuarios 
+                        (nombre, apellidos, cedula, fechaNacimiento, nombreUsuario, correo, contrasena, telefono, rol)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $hashedPassword, $telefono, $rol]);
 
-      $sql = "INSERT INTO Usuarios 
-                    (nombre, apellidos, cedula, fechaNacimiento, nombreUsuario, correo, contrasena, telefono, rol)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      $stmt = $pdo->prepare($sql);
-      $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $hashedPassword, $telefono, $rol]);
-
-      $mensaje = true;
-    } catch (PDOException $e) {
-      $errores[] = "Error al registrar el usuario: " . $e->getMessage();
+            $mensaje = true;
+        } catch (PDOException $e) {
+            $errores[] = "Error al registrar el usuario: " . $e->getMessage();
+        }
     }
-  }
 }
 ?>
 
@@ -107,54 +128,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <form method="POST" action="" class="needs-validation" novalidate>
         <div class="row g-3">
+
           <div class="col-md-6">
             <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Ingresa tu nombre" required>
+            <input type="text" id="nombre" name="nombre" class="form-control"
+                  value="<?= htmlspecialchars($_POST['nombre'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="apellidos" class="form-label">Apellidos</label>
-            <input type="text" id="apellidos" name="apellidos" class="form-control" placeholder="Ingresa tus apellidos" required>
+            <input type="text" id="apellidos" name="apellidos" class="form-control"
+                  value="<?= htmlspecialchars($_POST['apellidos'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="cedula" class="form-label">Cédula</label>
-            <input type="text" id="cedula" name="cedula" class="form-control" placeholder="Ingresa tu identificación" required>
+            <input type="text" id="cedula" name="cedula" class="form-control"
+                  value="<?= htmlspecialchars($_POST['cedula'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
-            <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control" required>
+            <input type="date" id="fechaNacimiento" name="fechaNacimiento" class="form-control"
+                  value="<?= htmlspecialchars($_POST['fechaNacimiento'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="nombreUsuario" class="form-label">Nombre de usuario</label>
-            <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-control" placeholder="Elige un nombre de usuario" required>
+            <input type="text" id="nombreUsuario" name="nombreUsuario" class="form-control"
+                  value="<?= htmlspecialchars($_POST['nombreUsuario'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="correo" class="form-label">Correo electrónico</label>
-            <input type="email" id="correo" name="correo" class="form-control" placeholder="email@example.com" required>
+            <input type="email" id="correo" name="correo" class="form-control"
+                  value="<?= htmlspecialchars($_POST['correo'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="password" class="form-label">Contraseña</label>
-            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+            <input type="password" id="password" name="password" class="form-control"
+                  value="<?= htmlspecialchars($_POST['password'] ?? '') ?>" required>
           </div>
 
           <div class="col-md-6">
             <label for="contrasena" class="form-label">Confirmar Contraseña</label>
-            <input type="password" id="contrasena" name="contrasena" class="form-control" placeholder="••••••••" required>
+            <input type="password" id="contrasena" name="contrasena" class="form-control"
+                  value="<?= htmlspecialchars($_POST['contrasena'] ?? '') ?>" required>
           </div>
 
           <div class="col-12">
             <label for="telefono" class="form-label">Teléfono</label>
-            <input type="tel" id="telefono" name="telefono" class="form-control" placeholder="Ej: 8888-8888" required>
+            <input type="tel" id="telefono" name="telefono" class="form-control"
+                  value="<?= htmlspecialchars($_POST['telefono'] ?? '') ?>" required>
           </div>
 
           <div class="col-12">
             <button type="submit" class="btn btn-success w-100 mt-3 py-2">Registrarme</button>
           </div>
+
         </div>
       </form>
 
@@ -190,8 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </div>
-</div>
- 
+
 <?php if ($mensaje): ?>
   <!-- Js del modal-->
   <script>
@@ -205,7 +236,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }, 4000);
     });
   </script>
-  
 <?php endif; ?>
 
   <footer class="footer bg-light border-top mt-5 py-4">
