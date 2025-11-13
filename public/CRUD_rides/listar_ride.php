@@ -100,7 +100,7 @@ $viajes = getViajesByChofer($idChofer);
                         data-id="<?= $v['idViaje'] ?>"
                         data-bs-toggle="modal"
                         data-bs-target="#modalCancelarViaje">
-                        <i class="bi bi-slash-circle"></i> Cancelar
+                        <i class="bi bi-slash-circle"></i> Cancelar viaje
                       </button>
                     <?php else: ?>
                       <button class="btn btn-outline-secondary btn-sm" disabled>
@@ -114,7 +114,7 @@ $viajes = getViajesByChofer($idChofer);
                       class="btn btn-outline-danger btn-sm"
                       data-bs-toggle="modal"
                       data-bs-target="#confirmarEliminar<?= $v['idViaje'] ?>">
-                      Eliminar
+                      Eliminar viaje de la lista
                     </button>
 
                     <!-- Modal de confirmación -->
