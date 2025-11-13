@@ -19,14 +19,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $passwordNueva = $_POST['passwordNueva'] ?? '';
   $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
 
-  // Valida si se desea cambiar la contraseña
-  if (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar)) {
-    // Obtener contraseña actual del usuario
+  $error = "";
+  $success = "";
+
+  // Validar correo único
+  $checkCorreo = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE correo = ? AND idUsuario != ?");
+  $checkCorreo->execute([$correo, $idUsuario]);
+  if ($checkCorreo->fetch()) {
+      $error = "El correo ingresado ya existe. Por favor ingrese otro.";
+  }
+  // Validar teléfono único
+  $checkTelefono = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE telefono = ? AND idUsuario != ?");
+  $checkTelefono->execute([$telefono, $idUsuario]);
+  if (empty($error) && $checkTelefono->fetch()) {
+      $error = "El número de teléfono ingresado ya existe. Por favor ingrese otro.";
+  }
+  // Validaciones de contraseña
+  if (empty($error) && (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar))) {
+
+    // Obtener contraseña actual
     $stmtPass = $pdo->prepare("SELECT contrasena FROM usuarios WHERE idUsuario = ?");
     $stmtPass->execute([$idUsuario]);
     $actual = $stmtPass->fetchColumn();
 
-    // Validaciones de contraseña
     if (hash('sha256', $passwordActual) !== $actual) {
       $error = "La contraseña actual no es correcta.";
     } elseif ($passwordNueva !== $passwordConfirmar) {
@@ -36,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (hash('sha256', $passwordNueva) === $actual) {
       $error = "La nueva contraseña no puede ser igual a la actual.";
     } else {
-      // Actualizar contraseña con hash SHA-256
+      // Actualizar contraseña
       $hashed = hash('sha256', $passwordNueva);
       $stmt = $pdo->prepare("UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?");
       $stmt->execute([$hashed, $idUsuario]);
@@ -44,11 +59,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  // Actualizar otros datos
-  $stmt = $pdo->prepare("UPDATE usuarios 
-                           SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, fechaNacimiento = ? 
-                           WHERE idUsuario = ?");
-  $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
+
+  // Actualizar otros datos si no hay errores
+  if (empty($error)) {
+      $stmt = $pdo->prepare("UPDATE usuarios 
+                            SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, fechaNacimiento = ? 
+                            WHERE idUsuario = ?");
+      $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
+
+      if (empty($success)) {
+          $success = "Datos actualizados correctamente.";
+      }
+  }
 }
 ?>
 
@@ -74,8 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <!-- Cuerpo del formulario -->
       <div class="px-3 pb-4 mt-3">
-        <?php if (isset($error)): ?>
-          <div class="alert alert-danger text-center"><?= $error ?></div>
+
+        <!-- ALERTA DE ERROR (CORRECTA) -->
+        <?php if (!empty($error)): ?>
+          <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" class="row g-3">
@@ -157,24 +181,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <?php if (isset($success)): ?>
-    
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
-      modal.show();
+  <?php if (!empty($success)): ?>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
+        modal.show();
 
-      // Redirigir automáticamente después de 5s
-      setTimeout(() => {
-        window.location.href = "miPerfil.php";
-      }, 5000);
+        setTimeout(() => {
+          window.location.href = "miPerfil.php";
+        }, 5000);
 
-      // O de inmediato si presiona el botón
-      document.getElementById('btnIrPerfil').addEventListener('click', function() {
-        window.location.href = "miPerfil.php";
+        document.getElementById('btnIrPerfil').addEventListener('click', function() {
+          window.location.href = "miPerfil.php";
+        });
       });
     </script>
   <?php endif; ?>
-</body>
 
+</body>
 </html>

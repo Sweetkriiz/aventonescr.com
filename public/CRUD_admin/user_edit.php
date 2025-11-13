@@ -59,6 +59,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errores[] = "El correo electrónico no es válido.";
   }
 
+  // Validar correo único
+  $checkCorreo = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE correo = ? AND idUsuario != ?");
+  $checkCorreo->execute([$correo, $id]);
+  if ($checkCorreo->fetch()) {
+      $errores[] = "El correo ingresado ya existe. Por favor ingrese otro.";
+  }
+
+  // Validar teléfono único
+  $checkTelefono = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE telefono = ? AND idUsuario != ?");
+  $checkTelefono->execute([$telefono, $id]);
+  if ($checkTelefono->fetch()) {
+      $errores[] = "El número de teléfono ingresado ya existe. Por favor ingrese otro.";
+  }
+  // Validar nombre de usuario único
+  $checkNombreUsuario = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE nombreUsuario = ? AND idUsuario != ?");
+  $checkNombreUsuario->execute([$nombreUsuario, $id]);
+  if ($checkNombreUsuario->fetch()) {
+      $errores[] = "El nombre de usuario ya está en uso. Por favor ingrese otro.";
+  }
+
+  // Validar cédula única
+  $checkCedula = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE cedula = ? AND idUsuario != ?");
+  $checkCedula->execute([$cedula, $id]);
+  if ($checkCedula->fetch()) {
+      $errores[] = "La cédula ingresada ya existe. Por favor ingrese otra.";
+  }
+
+
+
   // Si no hay errores, actualizar
   if (empty($errores)) {
     try {
@@ -223,4 +252,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-?> 
+?>
