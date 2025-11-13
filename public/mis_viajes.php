@@ -114,10 +114,24 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     <!-- Estado visual -->
                     <td>
-                      <span class="estado-<?= strtolower($r['estadoReserva']) ?>" id="estado-<?= $r['idReserva'] ?>">
-                        <?= ucfirst($r['estadoReserva']) ?>
+                      <?php
+                      // Traducción + color según estado
+                      $mapaEstados = [
+                        'pendiente' => ['texto' => 'Pendiente', 'color' => 'warning', 'icono' => 'bi-hourglass-split'],
+                        'aceptada' => ['texto' => 'Aceptada', 'color' => 'success', 'icono' => 'bi-check-circle'],
+                        'rechazada' => ['texto' => 'Rechazada', 'color' => 'danger', 'icono' => 'bi-x-circle'],
+                        'cancelada_por_pasajero' => ['texto' => 'Cancelado por pasajero', 'color' => 'secondary', 'icono' => 'bi-person-x'],
+                        'cancelada_por_chofer' => ['texto' => 'Cancelado por chofer', 'color' => 'dark', 'icono' => 'bi-car-front'],
+                      ];
+
+                      $estado = $mapaEstados[$r['estadoReserva']] ?? ['texto' => ucfirst($r['estadoReserva']), 'color' => 'secondary', 'icono' => 'bi-question-circle'];
+                      ?>
+                      <span class="badge bg-<?= $estado['color'] ?> d-inline-flex align-items-center gap-1" id="estado-<?= $r['idReserva'] ?>">
+                        <i class="bi <?= $estado['icono'] ?>"></i> <?= $estado['texto'] ?>
                       </span>
                     </td>
+
+
 
                     <!-- Botón cancelar (solo si está pendiente) -->
                     <td>
@@ -179,19 +193,31 @@ $reservas = $stmt->fetchAll(PDO::FETCH_ASSOC);
     document.getElementById('confirmarCancelar').addEventListener('click', () => {
       if (!reservaSeleccionada) return;
 
-      // Cambia el estado en pantalla
-      const estado = document.getElementById(`estado-${reservaSeleccionada}`);
-      estado.textContent = "Cancelada";
-      estado.className = "estado-cancelada";
+      fetch('cancelar_reserva.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'idReserva=' + encodeURIComponent(reservaSeleccionada)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'ok') {
+            // Actualiza el estado en pantalla
+            const estado = document.getElementById(`estado-${reservaSeleccionada}`);
+            estado.textContent = "Cancelada";
+            estado.className = "estado-cancelada";
 
-      // Desactiva el botón de cancelar
-      const fila = document.getElementById(`reserva-${reservaSeleccionada}`);
-      const boton = fila.querySelector('.btn-cancelar');
-      boton.remove();
+            const fila = document.getElementById(`reserva-${reservaSeleccionada}`);
+            const boton = fila.querySelector('.btn-cancelar');
+            if (boton) boton.remove();
 
-      // Cierra el modal
-      const modal = bootstrap.Modal.getInstance(document.getElementById('cancelarModal'));
-      modal.hide();
+            bootstrap.Modal.getInstance(document.getElementById('cancelarModal')).hide();
+          } else {
+            alert(data.mensaje);
+          }
+        })
+        .catch(() => alert('Error al conectar con el servidor.'));
     });
   </script>
 

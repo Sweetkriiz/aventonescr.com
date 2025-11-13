@@ -93,7 +93,23 @@ $viajes = getViajesByChofer($idChofer);
                       Editar
                     </a>
 
-                    <!-- Botón que abre el modal -->
+                    <!-- botón Cancelar (solo si está activo) -->
+                    <?php if ($v['estado'] === 'activo'): ?>
+                      <button
+                        class="btn btn-outline-danger btn-sm cancelar-viaje"
+                        data-id="<?= $v['idViaje'] ?>"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalCancelarViaje">
+                        <i class="bi bi-slash-circle"></i> Cancelar
+                      </button>
+                    <?php else: ?>
+                      <button class="btn btn-outline-secondary btn-sm" disabled>
+                        <i class="bi bi-x-circle"></i> Cancelado
+                      </button>
+                    <?php endif; ?>
+
+
+                    <!-- Botón Eliminar -->
                     <button type="button"
                       class="btn btn-outline-danger btn-sm"
                       data-bs-toggle="modal"
@@ -101,20 +117,14 @@ $viajes = getViajesByChofer($idChofer);
                       Eliminar
                     </button>
 
-                    <!-- MODAL Bootstrap -->
+                    <!-- Modal de confirmación -->
                     <div class="modal fade" id="confirmarEliminar<?= $v['idViaje'] ?>" tabindex="-1" aria-hidden="true">
                       <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content border-0 shadow-lg">
-
-                          <!-- Encabezado ROJO -->
                           <div class="modal-header bg-danger text-white">
-                            <h5 class="modal-title fw-semibold">
-                              Confirmar eliminación
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                            <h5 class="modal-title fw-semibold">Confirmar eliminación</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                           </div>
-
-                          <!-- Cuerpo del modal -->
                           <div class="modal-body text-center">
                             <p class="fw-semibold mb-2">
                               ¿Seguro que querés eliminar el ride
@@ -124,13 +134,10 @@ $viajes = getViajesByChofer($idChofer);
                               Esta acción eliminará el viaje y sus reservas asociadas permanentemente.
                             </p>
                           </div>
-
-                          <!-- Pie del modal -->
                           <div class="modal-footer justify-content-center">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                             <a href="ride_delete.php?id=<?= $v['idViaje'] ?>" class="btn btn-danger">Sí, eliminar</a>
                           </div>
-
                         </div>
                       </div>
                     </div>
@@ -141,19 +148,124 @@ $viajes = getViajesByChofer($idChofer);
           </table>
         </div>
       </div>
-      <!-- Si no hay rides -->
     <?php else: ?>
       <div class="alert alert-secondary text-center">
         No tenés rides publicados.
       </div>
     <?php endif; ?>
 
-    <!-- Botón para volver al panel -->
+    <!-- Botón volver -->
     <div class="mt-4 text-center">
       <a href="../dashboard_chofer.php" class="btn btn-secondary">Volver al Panel</a>
     </div>
 
   </div>
+
+  <!-- Modal confirmar cancelación -->
+  <div class="modal fade" id="modalCancelarViaje" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title fw-semibold">
+            Confirmar cancelación
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+        <div class="modal-body text-center">
+          <p class="mb-2">
+            ¿Seguro que querés <strong>cancelar este viaje</strong>?<br>
+            Esto también marcará como canceladas las reservas activas.
+          </p>
+          <div id="cancel-alert" class="alert d-none small mb-0"></div>
+        </div>
+
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, volver</button>
+          <button type="button" class="btn btn-danger" id="btn-confirmar-cancelacion">
+            Sí, cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  Script para cancelar viaje JS -->
+  <script>
+    let viajeSeleccionado = null;
+    let filaSeleccionada = null;
+
+    // 1 Cuando se abre el modal, guardamos cuál viaje se quiere cancelar
+    document.querySelectorAll('.cancelar-viaje').forEach(btn => {
+      btn.addEventListener('click', () => {
+        viajeSeleccionado = btn.dataset.id;
+        filaSeleccionada = btn.closest('tr');
+
+        // Limpiamos el mensaje anterior (por si queda algo en el modal)
+        const alertBox = document.getElementById('cancel-alert');
+        alertBox.className = 'alert d-none small mb-0';
+        alertBox.textContent = '';
+      });
+    });
+
+    // 2 Cuando se confirma dentro del modal, recién ahí hacemos el fetch()
+    document.getElementById('btn-confirmar-cancelacion').addEventListener('click', () => {
+      if (!viajeSeleccionado || !filaSeleccionada) return;
+
+      const alertBox = document.getElementById('cancel-alert');
+      alertBox.className = 'alert alert-warning small';
+      alertBox.innerHTML = `<i class="bi bi-hourglass-split"></i> Cancelando el viaje...`;
+
+      const btnConfirm = document.getElementById('btn-confirmar-cancelacion');
+      btnConfirm.disabled = true;
+
+      fetch('ride_cancel.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'idViaje=' + encodeURIComponent(viajeSeleccionado)
+        })
+        .then(r => r.json())
+        .then(data => {
+          alertBox.classList.remove('alert-warning');
+          alertBox.classList.add(data.status === 'ok' ? 'alert-success' : 'alert-danger');
+          alertBox.innerHTML = `
+        <i class="bi ${data.status === 'ok' ? 'bi-check-circle' : 'bi-exclamation-triangle'}"></i>
+        ${data.mensaje}
+      `;
+
+          if (data.status === 'ok') {
+            // Actualiza visualmente la fila
+            const estado = filaSeleccionada.querySelector('.badge');
+            estado.className = 'badge bg-danger';
+            estado.textContent = 'Cancelado';
+
+            const boton = filaSeleccionada.querySelector('.cancelar-viaje');
+            boton.disabled = true;
+            boton.classList.remove('btn-outline-danger');
+            boton.classList.add('btn-outline-secondary');
+            boton.innerHTML = '<i class="bi bi-x-circle"></i> Cancelado';
+
+            // Cerrar el modal con un pequeño delay
+            setTimeout(() => {
+              const modal = bootstrap.Modal.getInstance(document.getElementById('modalCancelarViaje'));
+              modal.hide();
+            }, 1000);
+          }
+        })
+        .catch(() => {
+          alertBox.classList.remove('alert-warning');
+          alertBox.classList.add('alert-danger');
+          alertBox.innerHTML = `<i class="bi bi-exclamation-triangle"></i> Error al conectar con el servidor.`;
+        })
+        .finally(() => {
+          btnConfirm.disabled = false;
+        });
+    });
+  </script>
+
+
 </body>
 
 </html>

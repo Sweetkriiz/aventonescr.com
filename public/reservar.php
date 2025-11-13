@@ -27,13 +27,21 @@ if (!$idViaje) {
 }
 
 try {
-  // Evitar doble reserva
-  $check = $pdo->prepare("SELECT 1 FROM Reservas WHERE idViaje = ? AND idPasajero = ?");
+  // Evitar doble reserva (solo si no está cancelada)
+  $check = $pdo->prepare("
+  SELECT 1 
+  FROM Reservas 
+  WHERE idViaje = ? 
+    AND idPasajero = ? 
+    AND estadoReserva NOT IN ('cancelada_por_pasajero', 'cancelada_por_chofer')
+");
   $check->execute([$idViaje, $idPasajero]);
+
   if ($check->fetch()) {
     echo json_encode(['status' => 'error', 'mensaje' => 'Ya reservaste este viaje.']);
     exit();
   }
+
 
   // Inicia una transacción para garantizar consistencia
   $pdo->beginTransaction();
