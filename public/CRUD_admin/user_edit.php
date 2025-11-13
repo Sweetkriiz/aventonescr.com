@@ -59,6 +59,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errores[] = "El correo electrónico no es válido.";
   }
 
+  // Validar correo único
+  $checkCorreo = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE correo = ? AND idUsuario != ?");
+  $checkCorreo->execute([$correo, $id]);
+  if ($checkCorreo->fetch()) {
+      $errores[] = "El correo ingresado ya existe. Por favor ingrese otro.";
+  }
+
+  // Validar teléfono único
+  $checkTelefono = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE telefono = ? AND idUsuario != ?");
+  $checkTelefono->execute([$telefono, $id]);
+  if ($checkTelefono->fetch()) {
+      $errores[] = "El número de teléfono ingresado ya existe. Por favor ingrese otro.";
+  }
+  // Validar nombre de usuario único
+  $checkNombreUsuario = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE nombreUsuario = ? AND idUsuario != ?");
+  $checkNombreUsuario->execute([$nombreUsuario, $id]);
+  if ($checkNombreUsuario->fetch()) {
+      $errores[] = "El nombre de usuario ya está en uso. Por favor ingrese otro.";
+  }
+
+  // Validar cédula única
+  $checkCedula = $pdo->prepare("SELECT idUsuario FROM Usuarios WHERE cedula = ? AND idUsuario != ?");
+  $checkCedula->execute([$cedula, $id]);
+  if ($checkCedula->fetch()) {
+      $errores[] = "La cédula ingresada ya existe. Por favor ingrese otra.";
+  }
+
+
+
   // Si no hay errores, actualizar
   if (empty($errores)) {
     try {
@@ -69,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmt = $pdo->prepare($sql);
       $stmt->execute([$nombre, $apellidos, $cedula, $fechaNacimiento, $nombreUsuario, $correo, $telefono, $rol, $id]);
 
-      // ✅ Redirigir con mensaje de éxito
+      // Redirigir con mensaje de éxito
       $_SESSION['success'] = 'Usuario actualizado correctamente.';
       header('Location: listar_usuarios.php');
       exit();
@@ -139,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="bi bi-arrow-left-circle"></i> Volver a Lista
           </a>
         </div>
-        
+         <!-- Mensaje de error -->
         <?php if (!empty($errores)): ?>
           <div class="alert alert-danger">
             <ul class="mb-0"><?php foreach ($errores as $error): ?><li><?= htmlspecialchars($error) ?></li><?php endforeach; ?></ul>
@@ -223,4 +252,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-?> 
+?>

@@ -6,9 +6,7 @@ body {
   color: #212529;
 }
 
-/* -------------------------------
-   TABLA
--------------------------------- */
+/* Tabla */
 .table {
   border-collapse: separate;
   border-spacing: 0 8px;
@@ -39,9 +37,7 @@ body {
   transform: scale(1.01);
 }
 
-/* -------------------------------
-   MODAL 
--------------------------------- */
+/* Modal */
 .modal-content {
   border-radius: 16px;
   border: 1px solid rgba(25, 135, 84, 0.15);
@@ -99,17 +95,6 @@ body {
   backdrop-filter: blur(5px);
 }
 
-/* Animación */
-@keyframes modalFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-15px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
 /* Etiquetas */
 .badge {

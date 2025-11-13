@@ -21,7 +21,6 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/miPerfil.css">
-
 </head>
 
 <body>
@@ -38,6 +37,7 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
       </div>
 
       <div class="profile-body px-4 pb-4">
+
         <div class="row mb-3">
           <div class="col-md-6">
             <p class="info-label"><i class="bi bi-person-badge"></i> Nombre de usuario:</p>
@@ -71,14 +71,29 @@ $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
           </div>
         </div>
 
+        <?php
+        // Mapa de rutas según el rol
+        $rol = strtolower($usuario['rol']);
+
+        $mapaRutas = [
+            'administrador' => 'dashboard_admin.php',
+            'chofer'        => 'dashboard_chofer.php',
+            'pasajero'      => 'dashboard_pasajero.php'
+        ];
+
+        $destino = $mapaRutas[$rol] ?? 'dashboard_pasajero.php';
+        ?>
+
         <div class="mt-4 text-center">
-          <a href="dashboard_<?= strtolower($usuario['rol']) ?>.php" class="btn btn-success px-4 me-2">
+          <a href="<?= $destino ?>" class="btn btn-success px-4 me-2">
             <i class="bi bi-arrow-left-circle"></i> Volver a inicio
           </a>
+
           <a href="edit_miperfil.php?id=<?= $usuario['idUsuario'] ?>" class="btn btn-outline-success px-4">
             <i class="bi bi-pencil-square"></i> Editar Perfil
           </a>
         </div>
+
       </div>
     </div>
   </div>
