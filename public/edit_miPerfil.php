@@ -10,79 +10,74 @@ $stmt->execute([$idUsuario]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $nombre = $_POST['nombre'] ?? '';
-  $apellidos = $_POST['apellidos'] ?? '';
-  $correo = $_POST['correo'] ?? '';
-  $telefono = $_POST['telefono'] ?? '';
-  $fechaNacimiento = $_POST['fechaNacimiento'] ?? '';
-  $passwordActual = $_POST['passwordActual'] ?? '';
-  $passwordNueva = $_POST['passwordNueva'] ?? '';
-  $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
+    $nombre = $_POST['nombre'] ?? '';
+    $apellidos = $_POST['apellidos'] ?? '';
+    $correo = $_POST['correo'] ?? '';
+    $telefono = $_POST['telefono'] ?? '';
+    $fechaNacimiento = $_POST['fechaNacimiento'] ?? '';
+    $passwordActual = $_POST['passwordActual'] ?? '';
+    $passwordNueva = $_POST['passwordNueva'] ?? '';
+    $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
 
-  // Variables de feedback
-  $error = "";
-  $successPassword = "";
-  $successGeneral = "";
+    $error = "";
+    $successPassword = "";
+    $successGeneral = "";
 
-  // Validar correo único
-  $checkCorreo = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE correo = ? AND idUsuario != ?");
-  $checkCorreo->execute([$correo, $idUsuario]);
-  if ($checkCorreo->fetch()) {
-      $error = "El correo ingresado ya existe. Por favor ingrese otro.";
-  }
-
-  // Validar teléfono único
-  $checkTelefono = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE telefono = ? AND idUsuario != ?");
-  $checkTelefono->execute([$telefono, $idUsuario]);
-  if (empty($error) && $checkTelefono->fetch()) {
-      $error = "El número de teléfono ingresado ya existe. Por favor ingrese otro.";
-  }
-
-  // Validaciones de contraseña
-  if (
-    empty($error) && 
-    (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar))
-  ) {
-
-    // Obtener contraseña actual
-    $stmtPass = $pdo->prepare("SELECT contrasena FROM usuarios WHERE idUsuario = ?");
-    $stmtPass->execute([$idUsuario]);
-    $actual = $stmtPass->fetchColumn();
-
-    if (hash('sha256', $passwordActual) !== $actual) {
-      $error = "La contraseña actual no es correcta.";
-    } 
-    elseif ($passwordNueva !== $passwordConfirmar) {
-      $error = "Las contraseñas nuevas no coinciden.";
-    } 
-    elseif (strlen($passwordNueva) < 8) {
-      $error = "La nueva contraseña debe tener al menos 8 caracteres.";
-    } 
-    elseif (hash('sha256', $passwordNueva) === $actual) {
-      $error = "La nueva contraseña no puede ser igual a la actual.";
-    } 
-    else {
-      // Actualizar contraseña
-      $hashed = hash('sha256', $passwordNueva);
-      $stmt = $pdo->prepare("UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?");
-      $stmt->execute([$hashed, $idUsuario]);
-      $successPassword = "Contraseña actualizada correctamente.";
+    // Validar correo único
+    $checkCorreo = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE correo = ? AND idUsuario != ?");
+    $checkCorreo->execute([$correo, $idUsuario]);
+    if ($checkCorreo->fetch()) {
+        $error = "El correo ingresado ya existe. Por favor ingrese otro.";
     }
-  }
 
-  // Actualizar otros datos si NO hay errores
-  if (empty($error)) {
+    // Validar teléfono único
+    $checkTelefono = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE telefono = ? AND idUsuario != ?");
+    $checkTelefono->execute([$telefono, $idUsuario]);
+    if (empty($error) && $checkTelefono->fetch()) {
+        $error = "El número de teléfono ingresado ya existe. Por favor ingrese otro.";
+    }
 
-      $stmt = $pdo->prepare("UPDATE usuarios 
-                            SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, fechaNacimiento = ? 
-                            WHERE idUsuario = ?");
-      $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
+    // Validar cambio de contraseña
+    if (empty($error) && (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar))) {
 
-      // Si NO hubo cambio de contraseña → mensaje general
-      if (empty($successPassword)) {
-          $successGeneral = "Datos actualizados correctamente.";
-      }
-  }
+        $stmtPass = $pdo->prepare("SELECT contrasena FROM usuarios WHERE idUsuario = ?");
+        $stmtPass->execute([$idUsuario]);
+        $actual = $stmtPass->fetchColumn();
+
+        if (hash('sha256', $passwordActual) !== $actual) {
+            $error = "La contraseña actual no es correcta.";
+        }
+        elseif ($passwordNueva !== $passwordConfirmar) {
+            $error = "Las contraseñas nuevas no coinciden.";
+        }
+        elseif (strlen($passwordNueva) < 8) {
+            $error = "La nueva contraseña debe tener al menos 8 caracteres.";
+        }
+        elseif (hash('sha256', $passwordNueva) === $actual) {
+            $error = "La nueva contraseña no puede ser igual a la actual.";
+        }
+        else {
+            // Actualizar contraseña
+            $hashed = hash('sha256', $passwordNueva);
+            $stmt = $pdo->prepare("UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?");
+            $stmt->execute([$hashed, $idUsuario]);
+
+            $successPassword = "Contraseña actualizada correctamente.";
+        }
+    }
+
+    // Si NO hay errores → actualizar datos y redirigir
+    if (empty($error)) {
+
+        $stmt = $pdo->prepare("UPDATE usuarios 
+                               SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, fechaNacimiento = ? 
+                               WHERE idUsuario = ?");
+        $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
+
+        // Redirect inmediato SIEMPRE que no haya error
+        header("Location: miPerfil.php");
+        exit;
+    }
 }
 ?>
 
@@ -108,41 +103,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <div class="px-3 pb-4 mt-3">
 
-        <!--Mensaje de error en general -->
+        <!-- Error -->
         <?php if (!empty($error)): ?>
-          <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-
-        <!-- Mensaje de exito  -->
-        <?php if (!empty($successGeneral)): ?>
-          <div class="alert alert-success text-center"><?= htmlspecialchars($successGeneral) ?></div>
+            <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
         <form method="POST" class="row g-3">
 
           <div class="col-md-6">
             <label class="form-label fw-semibold text-success"><i class="bi bi-person"></i> Nombre</label>
-            <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($usuario['nombre']) ?>" required>
+            <input type="text" name="nombre" class="form-control" 
+                   value="<?= htmlspecialchars($usuario['nombre']) ?>" required>
           </div>
 
           <div class="col-md-6">
             <label class="form-label fw-semibold text-success"><i class="bi bi-person-lines-fill"></i> Apellidos</label>
-            <input type="text" name="apellidos" class="form-control" value="<?= htmlspecialchars($usuario['apellidos']) ?>" required>
+            <input type="text" name="apellidos" class="form-control"
+                   value="<?= htmlspecialchars($usuario['apellidos']) ?>" required>
           </div>
 
           <div class="col-md-6">
             <label class="form-label fw-semibold text-success"><i class="bi bi-envelope"></i> Correo electrónico</label>
-            <input type="email" name="correo" class="form-control" value="<?= htmlspecialchars($usuario['correo']) ?>" required>
+            <input type="email" name="correo" class="form-control"
+                   value="<?= htmlspecialchars($usuario['correo']) ?>" required>
           </div>
 
           <div class="col-md-6">
             <label class="form-label fw-semibold text-success"><i class="bi bi-telephone"></i> Teléfono</label>
-            <input type="text" name="telefono" class="form-control" value="<?= htmlspecialchars($usuario['telefono']) ?>" required>
+            <input type="text" name="telefono" class="form-control"
+                   value="<?= htmlspecialchars($usuario['telefono']) ?>" required>
           </div>
 
           <div class="col-md-6">
             <label class="form-label fw-semibold text-success"><i class="bi bi-calendar-date"></i> Fecha de nacimiento</label>
-            <input type="date" name="fechaNacimiento" class="form-control" value="<?= htmlspecialchars($usuario['fechaNacimiento']) ?>">
+            <input type="date" name="fechaNacimiento" class="form-control"
+                   value="<?= htmlspecialchars($usuario['fechaNacimiento']) ?>">
           </div>
 
           <hr class="mt-4 mb-2">
@@ -172,22 +167,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <i class="bi bi-check-circle"></i> Guardar cambios
             </button>
           </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
-  <!-- Modal solo SI SE CAMBIÓ LA CONTRASEÑA -->
-  <div class="modal fade" id="modalSuccess" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg rounded-4">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i> Contraseña actualizada</h5>
-        </div>
-        <div class="modal-body text-center">
-          <p class="fs-5 text-muted mb-3">Tu contraseña se ha actualizado correctamente.</p>
-          <button type="button" id="btnIrPerfil" class="btn btn-success px-4 py-2 rounded-pill">Ir a mi perfil</button>
-        </div>
+        </form>
       </div>
     </div>
   </div>
@@ -198,23 +179,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Mostrar modal SOLO si se cambió la contraseña -->
-  <?php if (!empty($successPassword)): ?>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
-        modal.show();
-
-        setTimeout(() => {
-          window.location.href = "miPerfil.php";
-        }, 5000);
-
-        document.getElementById('btnIrPerfil').addEventListener('click', function() {
-          window.location.href = "miPerfil.php";
-        });
-      });
-    </script>
-  <?php endif; ?>
-
 </body>
 </html>
+
