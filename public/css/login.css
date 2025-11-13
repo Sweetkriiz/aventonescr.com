@@ -44,10 +44,12 @@ body {
 }
 
 .logo-login {
-    width: 120px;
+    width: 230px !important;
+    height: auto !important;
     display: block;
-    margin: 0 auto 1rem auto;
+    margin: 0 auto 1.5rem auto;
 }
+
 
 /* Botón principal */
 .btn-primary {
