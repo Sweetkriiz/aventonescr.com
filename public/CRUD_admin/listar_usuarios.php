@@ -18,6 +18,7 @@ $usuarios = obtenerUsuarios();
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+   <!-- CSS personalizado del admin -->
   <link rel="stylesheet" href="../css/admin.css">
 </head>
 
@@ -26,6 +27,7 @@ $usuarios = obtenerUsuarios();
   <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2 class="fw-bold text-success">Usuarios</h2>
+       <!-- Botón para agregar un usuario nuevo -->
       <a href="user_create.php" class="btn btn-success">+ Agregar Usuario</a>
     </div>
 
@@ -57,6 +59,7 @@ $usuarios = obtenerUsuarios();
                     <td><?= htmlspecialchars($u['telefono']) ?></td>
                     <td>
                       <?php
+                      // Se asigna un color distinto a cada tipo de rol
                       $rolColor = match ($u['rol']) {
                         'administrador' => 'bg-danger',
                         'chofer' => 'bg-primary',
@@ -133,18 +136,22 @@ $usuarios = obtenerUsuarios();
   <div class="modal fade" id="modalEliminarUsuario" tabindex="-1" aria-labelledby="modalEliminarUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
+         <!-- Encabezado rojo -->
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle"></i> Confirmar eliminación</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
+         <!-- Mensaje -->
         <div class="modal-body">
           <p class="mb-2">¿Estás seguro de que deseas eliminar al usuario <strong id="usuarioAEliminar"></strong>?</p>
           <p class="text-muted small mb-0">Esta acción no se puede deshacer.</p>
         </div>
+        <!-- Botones -->
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             <i class="bi bi-x-circle"></i> Cancelar
           </button>
+          <!-- Formulario que envía el ID al eliminar -->
           <form id="formEliminarUsuario" action="user_delete.php" method="POST" style="display:inline;">
             <input type="hidden" name="id" id="inputIdUsuario">
             <button type="submit" class="btn btn-danger">
@@ -214,17 +221,18 @@ $usuarios = obtenerUsuarios();
 
   <!-- Script modal de eliminación -->
   <script>
+    // Cuando se abre el modal de eliminar, toma los datos del botón que lo llamó
     const modalEliminar = document.getElementById('modalEliminarUsuario');
     modalEliminar.addEventListener('show.bs.modal', event => {
-      const button = event.relatedTarget;
+      const button = event.relatedTarget; // Botón que abrió el modal
       const idUsuario = button.getAttribute('data-id');
       const nombreUsuario = button.getAttribute('data-nombre');
-
+      // Se insertan los datos en el modal
       modalEliminar.querySelector('#usuarioAEliminar').textContent = nombreUsuario;
       modalEliminar.querySelector('#inputIdUsuario').value = idUsuario;
     });
   </script>
-
+<!-- Script JS que maneja el modal de "ver usuario" -->
   <script src="../js/usuarios.js"></script>
 </body>
 </html>

@@ -20,27 +20,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $telefono = trim($_POST['telefono']);
   $rol = $_POST['rol'] ?? 'pasajero';
 
-  // Validaciones
+  // VALIDACIONES BÁSICAS
   if (
     empty($nombre) || empty($apellidos) || empty($cedula) || empty($fechaNacimiento) ||
     empty($nombreUsuario) || empty($correo) || empty($password) || empty($confirmar) || empty($telefono)
   ) {
     $errores[] = "Todos los campos son obligatorios.";
   }
-
+  // Validar formato del correo
   if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) {
     $errores[] = "El correo electrónico no es válido.";
   }
-
+ // Validar que ambas contraseñas coincidan
   if ($password !== $confirmar) {
     $errores[] = "Las contraseñas no coinciden.";
   }
-
+// Validar longitud mínima de la contraseña
   if (strlen($password) < 8) {
     $errores[] = "La contraseña debe tener al menos 8 caracteres.";
   }
 
-  // Verificar duplicados
+  //  VERIFICAR SI YA EXISTE: correo, cédula, teléfono o username
   if (empty($errores)) {
     try {
       $sqlCheck = "SELECT COUNT(*) FROM Usuarios 
