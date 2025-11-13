@@ -7,7 +7,7 @@ El sistema busca promover la movilidad sostenible, optimizar los recursos de tra
 
 ## Características principales
 
-### 👥 Roles de usuario
+### Roles de usuario
 - **Administrador:** aprueba o rechaza vehículos y gestiona usuarios.
 - **Chofer:** registra vehículos, publica viajes y administra sus rutas.
 - **Pasajero:** busca, reserva y cancela viajes disponibles.
@@ -33,46 +33,6 @@ El sistema busca promover la movilidad sostenible, optimizar los recursos de tra
 - **Servidor local:** Apache 
 - **Control de versiones:** Git + GitHub  
 
----
-
-## Estructura del proyecto
-
-config/
- ├── database.php
- ├── database.sql
- ├── funciones_admin.php
- ├── funciones_carro.php
- ├── funciones_ride.php
- └── start_app.php
-
-public/
- ├── CRUD_admin/
- ├── CRUD_pasajero/
- ├── CRUD_rides/
- ├── CRUD_vehiculos/
- ├── css/
- ├── images/
- ├── includes/
- ├── js/
- ├── uploads/
- ├── buscar_viaje.php
- ├── cancelar_reserva.php
- ├── dashboard_admin.php
- ├── dashboard_chofer.php
- ├── dashboard_pasajero.php
- ├── edit_miPerfil.php
- ├── index.php
- ├── login.php
- ├── logout.php
- ├── miPerfil.php
- ├── mis_viajes.php
- ├── procesarSolicitudes.php
- ├── registrarse.php
- ├── reservar.php
- ├── resultados.php
- ├── solicitudes_chofer.php
- └── testdb.php
- 
 ---
 
 ##  Funciones destacadas
