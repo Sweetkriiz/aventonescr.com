@@ -67,7 +67,7 @@ include('includes/navbar.php');
     </div>
   </section>
 
-    <!-- Notificiacion de vehiculo aprobado o rechazado -->
+  <!-- Notificiacion de vehiculo aprobado o rechazado -->
   <?php
   if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare("
@@ -89,24 +89,31 @@ include('includes/navbar.php');
         case 'rechazado':
           $mensaje = "Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>rechazado</b>.";
           $clase = 'alert-danger';
-          // Si el usuario es chofer, lo mantiene en su panel de chofer
-          $linkDestino = ($rolActual === 'chofer')
-            ? 'listar_vehiculo.php'
-            : 'dashboard_pasajero.php';
+          // CHOFER siempre va a listar_vehiculo
+          $linkDestino = 'CRUD_vehiculos/listar_vehiculo.php';
           break;
 
         case 'pendiente':
           $mensaje = "Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> está en <b>revisión</b>.";
           $clase = 'alert-warning';
-          $linkDestino = 'dashboard_pasajero.php';
+          // Pasajero o chofer, ambos ven su panel
+          $linkDestino = ($_SESSION['rol'] === 'chofer')
+            ? 'dashboard_chofer.php'
+            : 'dashboard_pasajero.php';
           break;
 
         case 'aprobado':
-          $mensaje = " Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>aprobado</b>.";
+          $mensaje = "Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>aprobado</b>.";
           $clase = 'alert-success';
-          $linkDestino = 'listar_vehiculo.php';
+
+          // Si es chofer → directo al panel chofer
+          // Si es pasajero → listar_vehiculo porque ya es chofer
+          $linkDestino = ($_SESSION['rol'] === 'chofer')
+            ? 'dashboard_chofer.php'
+            : 'CRUD_vehiculos/listar_vehiculo.php';
           break;
       }
+
 
       echo "
       <div class='alert {$clase} d-flex align-items-center shadow-sm border-0 rounded-3 mt-3 mx-auto' role='alert' style='max-width: 700px;'>
