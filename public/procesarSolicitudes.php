@@ -4,7 +4,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/funciones_admin.php';
 include('includes/navbar.php');
 
-    //Procesar aprobación
+//Procesar aprobación
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $idVehiculo = $_POST['id'] ?? null;
   $accion = $_POST['accion'] ?? null;
@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 leido = 1 -- ya leído, no hay notificación pendiente
             WHERE idVehiculo = ?
         ");
-        $stmt->execute([$idVehiculo]);
+    $stmt->execute([$idVehiculo]);
 
-        // Cambiar rol a chofer 
-        $stmtChofer = $pdo->prepare("SELECT idChofer FROM vehiculos WHERE idVehiculo = ?");
-        $stmtChofer->execute([$idVehiculo]);
-        $idChofer = $stmtChofer->fetchColumn();
+    // Cambiar rol a chofer 
+    $stmtChofer = $pdo->prepare("SELECT idChofer FROM vehiculos WHERE idVehiculo = ?");
+    $stmtChofer->execute([$idVehiculo]);
+    $idChofer = $stmtChofer->fetchColumn();
 
     // --- Cambiar rol a chofer si aplica ---
     $stmtChofer = $pdo->prepare("SELECT idChofer FROM vehiculos WHERE idVehiculo = ?");
@@ -34,17 +34,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $stmtRol->execute([$idChofer]);
       $rolActual = $stmtRol->fetchColumn();
 
-        $_SESSION['mensaje'] = "Vehículo aprobado correctamente.";
+      $_SESSION['mensaje'] = "Vehículo aprobado correctamente.";
+      header("Location: procesarSolicitudes.php");
+      exit();
+      //Procesar rechazo
+    } elseif ($accion === 'rechazar' && $idVehiculo) {
+      $motivo = trim($_POST['motivo'] ?? '');
+      if (empty($motivo)) {
+        $_SESSION['error'] = 'Debe indicar el motivo de rechazo.';
         header("Location: procesarSolicitudes.php");
         exit();
-    //Procesar rechazo
-    } elseif ($accion === 'rechazar' && $idVehiculo) {
-        $motivo = trim($_POST['motivo'] ?? '');
-        if (empty($motivo)) {
-            $_SESSION['error'] = 'Debe indicar el motivo de rechazo.';
-            header("Location: procesarSolicitudes.php");
-            exit();
-        }
+      }
+    }
 
     $stmt = $pdo->prepare("
             UPDATE vehiculos 
@@ -108,8 +109,8 @@ if (!empty($busqueda)) {
         WHERE v.estado IN ('pendiente','rechazado','aprobado')
         ORDER BY v.idVehiculo DESC
     ");
-    // Obtener todos los vehículos pendientes, aprobados o rechazados
-    $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  // Obtener todos los vehículos pendientes, aprobados o rechazados
+  $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -164,10 +165,10 @@ if (!empty($busqueda)) {
         </a>
       </form>
     </div>
-  <!-- Cards de vehículos-->
-  <?php if (empty($vehiculosPendientes)): ?>
-    <div class="alert alert-info text-center">No se encontraron vehículos.</div>
-  <?php else: ?>
+    <!-- Cards de vehículos-->
+    <?php if (empty($vehiculosPendientes)): ?>
+      <div class="alert alert-info text-center">No se encontraron vehículos.</div>
+    <?php else: ?>
       <div class="row row-cols-1 row-cols-md-3 g-4">
         <?php foreach ($vehiculosPendientes as $vehiculo): ?>
           <div class="col">
@@ -257,7 +258,7 @@ if (!empty($busqueda)) {
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-   <!-- Js para obtener el id del modal  -->
+  <!-- Js para obtener el id del modal  -->
   <script>
     const modalRechazo = document.getElementById('modalRechazo');
     modalRechazo.addEventListener('show.bs.modal', event => {
@@ -265,6 +266,9 @@ if (!empty($busqueda)) {
       modalRechazo.querySelector('#vehiculoId').value = button.getAttribute('data-id');
     });
   </script>
+
+
+
 </body>
 
 </html>
