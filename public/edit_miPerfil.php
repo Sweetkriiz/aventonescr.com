@@ -19,8 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $passwordNueva = $_POST['passwordNueva'] ?? '';
   $passwordConfirmar = $_POST['passwordConfirmar'] ?? '';
 
+  // Variables de feedback
   $error = "";
-  $success = "";
+  $successPassword = "";
+  $successGeneral = "";
 
   // Validar correo único
   $checkCorreo = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE correo = ? AND idUsuario != ?");
@@ -28,14 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($checkCorreo->fetch()) {
       $error = "El correo ingresado ya existe. Por favor ingrese otro.";
   }
+
   // Validar teléfono único
   $checkTelefono = $pdo->prepare("SELECT idUsuario FROM usuarios WHERE telefono = ? AND idUsuario != ?");
   $checkTelefono->execute([$telefono, $idUsuario]);
   if (empty($error) && $checkTelefono->fetch()) {
       $error = "El número de teléfono ingresado ya existe. Por favor ingrese otro.";
   }
+
   // Validaciones de contraseña
-  if (empty($error) && (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar))) {
+  if (
+    empty($error) && 
+    (!empty($passwordActual) || !empty($passwordNueva) || !empty($passwordConfirmar))
+  ) {
 
     // Obtener contraseña actual
     $stmtPass = $pdo->prepare("SELECT contrasena FROM usuarios WHERE idUsuario = ?");
@@ -44,31 +51,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (hash('sha256', $passwordActual) !== $actual) {
       $error = "La contraseña actual no es correcta.";
-    } elseif ($passwordNueva !== $passwordConfirmar) {
+    } 
+    elseif ($passwordNueva !== $passwordConfirmar) {
       $error = "Las contraseñas nuevas no coinciden.";
-    } elseif (strlen($passwordNueva) < 8) {
+    } 
+    elseif (strlen($passwordNueva) < 8) {
       $error = "La nueva contraseña debe tener al menos 8 caracteres.";
-    } elseif (hash('sha256', $passwordNueva) === $actual) {
+    } 
+    elseif (hash('sha256', $passwordNueva) === $actual) {
       $error = "La nueva contraseña no puede ser igual a la actual.";
-    } else {
+    } 
+    else {
       // Actualizar contraseña
       $hashed = hash('sha256', $passwordNueva);
       $stmt = $pdo->prepare("UPDATE usuarios SET contrasena = ? WHERE idUsuario = ?");
       $stmt->execute([$hashed, $idUsuario]);
-      $success = "Contraseña actualizada correctamente.";
+      $successPassword = "Contraseña actualizada correctamente.";
     }
   }
 
-
-  // Actualizar otros datos si no hay errores
+  // Actualizar otros datos si NO hay errores
   if (empty($error)) {
+
       $stmt = $pdo->prepare("UPDATE usuarios 
                             SET nombre = ?, apellidos = ?, correo = ?, telefono = ?, fechaNacimiento = ? 
                             WHERE idUsuario = ?");
       $stmt->execute([$nombre, $apellidos, $correo, $telefono, $fechaNacimiento, $idUsuario]);
 
-      if (empty($success)) {
-          $success = "Datos actualizados correctamente.";
+      // Si NO hubo cambio de contraseña → mensaje general
+      if (empty($successPassword)) {
+          $successGeneral = "Datos actualizados correctamente.";
       }
   }
 }
@@ -94,15 +106,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i> Editar Perfil</h4>
       </div>
 
-      <!-- Cuerpo del formulario -->
       <div class="px-3 pb-4 mt-3">
 
-        <!-- ALERTA DE ERROR (CORRECTA) -->
+        <!--Mensaje de error en general -->
         <?php if (!empty($error)): ?>
           <div class="alert alert-danger text-center"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
+        <!-- Mensaje de exito  -->
+        <?php if (!empty($successGeneral)): ?>
+          <div class="alert alert-success text-center"><?= htmlspecialchars($successGeneral) ?></div>
+        <?php endif; ?>
+
         <form method="POST" class="row g-3">
+
           <div class="col-md-6">
             <label class="form-label fw-semibold text-success"><i class="bi bi-person"></i> Nombre</label>
             <input type="text" name="nombre" class="form-control" value="<?= htmlspecialchars($usuario['nombre']) ?>" required>
@@ -160,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 
-  <!-- Modal de confirmación -->
+  <!-- Modal solo SI SE CAMBIÓ LA CONTRASEÑA -->
   <div class="modal fade" id="modalSuccess" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg rounded-4">
@@ -181,7 +198,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <?php if (!empty($success)): ?>
+  <!-- Mostrar modal SOLO si se cambió la contraseña -->
+  <?php if (!empty($successPassword)): ?>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const modal = new bootstrap.Modal(document.getElementById('modalSuccess'));
