@@ -54,7 +54,12 @@ include('includes/navbar.php');
         </div>
         <div class="col-md-2">
           <label for="fecha" class="form-label">Fecha</label>
-          <input type="date" class="form-control" id="fecha" required>
+          <input type="date" class="form-control" id="fecha">
+
+          <!-- Texto aclaratorio -->
+          <small class="text-white-50" style="font-size: 0.75rem;">
+            Deje la fecha vacía para ver todos los viajes disponibles.
+          </small>
         </div>
         <div class="col-md-2">
           <label for="pasajeros" class="form-label">Pasajeros</label>

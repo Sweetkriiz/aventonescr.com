@@ -1,45 +1,28 @@
 <?php
 require_once '../config/database.php';
 
-// Indicamos que la respuesta será JSON (para fetch())
+// Indicamos que la respuesta será JSON
 header('Content-Type: application/json');
 
-// --- Leer datos enviados desde index.php (fetch) ---
+// Leer datos desde fetch()
 $data = json_decode(file_get_contents("php://input"), true);
 
-// --- Limpieza y validación de los datos recibidos ---
-$origen   = trim($data['origen'] ?? '');
-$destino  = trim($data['destino'] ?? '');
-$fecha    = trim($data['fecha'] ?? '');
+// Limpiar inputs
+$origen    = trim($data['origen'] ?? '');
+$destino   = trim($data['destino'] ?? '');
+$fecha     = trim($data['fecha'] ?? '');
 $pasajeros = intval($data['pasajeros'] ?? 1);
 
-// Validar campos obligatorios
-if ($origen === '' || $destino === '' || $fecha === '') {
+// Validar campos mínimos (origen y destino)
+if ($origen === '' || $destino === '') {
     echo json_encode([
         "status"  => "error",
-        "message" => "Faltan datos para realizar la búsqueda."
+        "message" => "Debe ingresar origen y destino."
     ]);
     exit;
 }
 
-// Validar formato de fecha (evita consultas con basura)
-if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
-    echo json_encode([
-        "status"  => "error",
-        "message" => "Formato de fecha inválido."
-    ]);
-    exit;
-}
-
-//  Validar que la fecha no sea anterior a hoy
-if (strtotime($fecha) < strtotime('today')) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "La fecha seleccionada no puede ser anterior a hoy."
-    ]);
-    exit;
-}
-// Validar que la cantidad de pasajeros sea positiva
+// Validar cantidad de pasajeros
 if ($pasajeros < 1) {
     echo json_encode([
         "status"  => "error",
@@ -48,39 +31,67 @@ if ($pasajeros < 1) {
     exit;
 }
 
+// Si el usuario SÍ escogió fecha → validar formato
+if ($fecha !== '') {
+
+    // Validar formato
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+        echo json_encode([
+            "status"  => "error",
+            "message" => "Formato de fecha inválido."
+        ]);
+        exit;
+    }
+
+    // Validar que no sea fecha pasada
+    if (strtotime($fecha) < strtotime('today')) {
+        echo json_encode([
+            "status" => "error",
+            "message" => "La fecha seleccionada no puede ser anterior a hoy."
+        ]);
+        exit;
+    }
+}
+
 try {
-    // --- Consulta SQL mejorada ---
-    // Busca viajes que coincidan con origen, destino y fecha exacta
-    // y con suficientes espacios disponibles, solo si están activos.
+
+    // Base del SQL
     $sql = "SELECT COUNT(*) AS total
             FROM Viajes
-            WHERE origen LIKE :origen
-              AND destino LIKE :destino
-              AND fecha = :fecha
+            WHERE LOWER(TRIM(origen)) LIKE LOWER(TRIM(:origen))
+              AND LOWER(TRIM(destino)) LIKE LOWER(TRIM(:destino))
               AND espaciosDisponibles >= :pasajeros
               AND estado = 'activo'";
 
+    $params = [
+        ':origen'    => "%" . $origen . "%",
+        ':destino'   => "%" . $destino . "%",
+        ':pasajeros' => $pasajeros
+    ];
+
+    // Si el usuario SÍ escogió fecha → filtrar
+    if ($fecha !== '') {
+        $sql .= " AND fecha = :fecha";
+        $params[':fecha'] = $fecha;
+    }
+
+    // Preparar y ejecutar la consulta
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':origen'     => "%$origen%",
-        ':destino'    => "%$destino%",
-        ':fecha'      => $fecha,
-        ':pasajeros'  => $pasajeros
-    ]);
+    $stmt->execute($params);
 
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // --- Respuesta JSON según los resultados ---
+    // Respuesta
     if ($result && $result['total'] > 0) {
-        // Hay resultados → se redirige en index.js
         echo json_encode(["status" => "ok"]);
     } else {
-        // No hay resultados, pero seguimos el flujo normal
         echo json_encode(["status" => "no_results"]);
     }
+
 } catch (PDOException $e) {
-    // Manejo de error interno (evita exponer detalles al usuario)
+
     error_log("Error en buscar_viaje.php: " . $e->getMessage());
+
     echo json_encode([
         "status"  => "error",
         "message" => "Error al realizar la búsqueda en la base de datos."

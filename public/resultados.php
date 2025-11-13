@@ -3,34 +3,44 @@ session_start();
 require_once '../config/database.php';
 include('includes/navbar.php');
 
-// --- Obtener los datos enviados desde index.php ---
-$origen = $_GET['origen'] ?? '';
-$destino = $_GET['destino'] ?? '';
+// Obtener variables
+$origen = strtolower(trim($_GET['origen'] ?? ''));
+$destino = strtolower(trim($_GET['destino'] ?? ''));
 $fecha = $_GET['fecha'] ?? '';
 $pasajeros = $_GET['pasajeros'] ?? 1;
 
-// --- Consulta dinámica a la base de datos ---
+// Construcción dinámica del SQL
 $sql = "SELECT v.*, u.nombre AS chofer_nombre, ve.modelo, ve.marca, ve.color
         FROM Viajes v
         INNER JOIN Usuarios u ON v.idChofer = u.idUsuario
         INNER JOIN Vehiculos ve ON v.idVehiculo = ve.idVehiculo
-        WHERE v.origen LIKE :origen
-          AND v.destino LIKE :destino
-          AND v.fecha = :fecha
+        WHERE LOWER(TRIM(v.origen)) LIKE LOWER(TRIM(:origen))
+          AND LOWER(TRIM(v.destino)) LIKE LOWER(TRIM(:destino))
           AND v.espaciosDisponibles >= :pasajeros
-          AND v.estado = 'activo'
-        ORDER BY v.horaSalida ASC";
+          AND v.estado = 'activo'";
 
+$params = [
+    ':origen' => "%" . $origen . "%",
+    ':destino' => "%" . $destino . "%",
+    ':pasajeros' => $pasajeros
+];
+
+// Si el usuario sí puso fecha → agregar filtro
+if ($fecha !== '') {
+    $sql .= " AND v.fecha = :fecha";
+    $params[':fecha'] = $fecha;
+}
+
+// Orden final
+$sql .= " ORDER BY v.horaSalida ASC";
+
+// Ejecutar consulta
 $stmt = $pdo->prepare($sql);
-$stmt->execute([
-  ':origen' => "%$origen%",
-  ':destino' => "%$destino%",
-  ':fecha' => $fecha,
-  ':pasajeros' => $pasajeros
-]);
+$stmt->execute($params);
 
 $viajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="es">
