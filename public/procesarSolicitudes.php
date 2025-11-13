@@ -6,11 +6,11 @@ include('includes/navbar.php');
 
     //Procesar aprobación
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $idVehiculo = $_POST['id'] ?? null;
-    $accion = $_POST['accion'] ?? null;
+  $idVehiculo = $_POST['id'] ?? null;
+  $accion = $_POST['accion'] ?? null;
 
-        if ($accion === 'aprobar' && $idVehiculo) {
-        $stmt = $pdo->prepare("
+  if ($accion === 'aprobar' && $idVehiculo) {
+    $stmt = $pdo->prepare("
             UPDATE vehiculos 
             SET estado = 'aprobado', 
                 motivoRechazo = NULL,
@@ -24,16 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtChofer->execute([$idVehiculo]);
         $idChofer = $stmtChofer->fetchColumn();
 
-        if ($idChofer) {
-            $stmtRol = $pdo->prepare("SELECT rol FROM usuarios WHERE idUsuario = ?");
-            $stmtRol->execute([$idChofer]);
-            $rolActual = $stmtRol->fetchColumn();
+    // --- Cambiar rol a chofer si aplica ---
+    $stmtChofer = $pdo->prepare("SELECT idChofer FROM vehiculos WHERE idVehiculo = ?");
+    $stmtChofer->execute([$idVehiculo]);
+    $idChofer = $stmtChofer->fetchColumn();
 
-            if ($rolActual === 'pasajero') {
-                $stmtUpdateRol = $pdo->prepare("UPDATE usuarios SET rol = 'chofer' WHERE idUsuario = ?");
-                $stmtUpdateRol->execute([$idChofer]);
-            }
-        }
+    if ($idChofer) {
+      $stmtRol = $pdo->prepare("SELECT rol FROM usuarios WHERE idUsuario = ?");
+      $stmtRol->execute([$idChofer]);
+      $rolActual = $stmtRol->fetchColumn();
 
         $_SESSION['mensaje'] = "Vehículo aprobado correctamente.";
         header("Location: procesarSolicitudes.php");
@@ -47,18 +46,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        $stmt = $pdo->prepare("
+    $stmt = $pdo->prepare("
             UPDATE vehiculos 
             SET estado = 'rechazado', 
                 motivoRechazo = ?, 
                 leido = 0
             WHERE idVehiculo = ?
         ");
-        $stmt->execute([$motivo, $idVehiculo]);
-        $_SESSION['mensaje'] = "Vehículo rechazado correctamente.";
-        header("Location: procesarSolicitudes.php");
-        exit();
-    }
+    $stmt->execute([$motivo, $idVehiculo]);
+    $_SESSION['mensaje'] = "Vehículo rechazado correctamente.";
+    header("Location: procesarSolicitudes.php");
+    exit();
+  }
 }
 
 //Filtro de búsqueda 
@@ -66,7 +65,7 @@ $busqueda = $_GET['busqueda'] ?? null;
 
 // Consulta de vehículos pendientes, aprobados o rechazados
 if (!empty($busqueda)) {
-    $stmt = $pdo->prepare("
+  $stmt = $pdo->prepare("
         SELECT 
             v.idVehiculo AS id,
             v.marca,
@@ -87,11 +86,11 @@ if (!empty($busqueda)) {
             OR u.apellidos LIKE :busqueda
         ORDER BY v.idVehiculo DESC
     ");
-    $stmt->bindValue(':busqueda', "%$busqueda%");
-    $stmt->execute();
-    $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt->bindValue(':busqueda', "%$busqueda%");
+  $stmt->execute();
+  $vehiculosPendientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $pdo->query("
+  $stmt = $pdo->query("
         SELECT 
             v.idVehiculo AS id,
             v.marca,
@@ -116,6 +115,7 @@ if (!empty($busqueda)) {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -125,6 +125,7 @@ if (!empty($busqueda)) {
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/procesarSolicitudes.css">
 </head>
+
 <body>
 
   <!-- Mensajes -->
@@ -152,9 +153,9 @@ if (!empty($busqueda)) {
     <!-- Buscador -->
     <div class="container mb-4">
       <form method="GET" class="d-flex justify-content-center">
-        <input type="text" name="busqueda" class="form-control me-2" 
-               placeholder="Buscar por nombre o usuario..." 
-               style="max-width: 400px;" value="<?= htmlspecialchars($_GET['busqueda'] ?? '') ?>">
+        <input type="text" name="busqueda" class="form-control me-2"
+          placeholder="Buscar por nombre o usuario..."
+          style="max-width: 400px;" value="<?= htmlspecialchars($_GET['busqueda'] ?? '') ?>">
         <button type="submit" class="btn btn-success">
           <i class="bi bi-search"></i> Buscar
         </button>
@@ -176,7 +177,6 @@ if (!empty($busqueda)) {
               <?php else: ?>
                 <img src="https://cdn-icons-png.flaticon.com/512/743/743131.png" alt="Vehículo genérico">
               <?php endif; ?>
-
               <div class="card-body">
                 <h5 class="card-title"><?= htmlspecialchars($vehiculo['marca'] . ' ' . $vehiculo['modelo']) ?></h5>
                 <p class="card-text mb-1"><strong>Chofer:</strong> <?= htmlspecialchars($vehiculo['nombreCompleto']) ?></p>
@@ -186,10 +186,9 @@ if (!empty($busqueda)) {
 
                 <!-- Badge de estado -->
                 <p class="card-text mb-2">
-                  <strong>Estado:</strong> 
+                  <strong>Estado:</strong>
                   <span class="badge 
-                    <?= $vehiculo['estado'] === 'aprobado' ? 'bg-success' : 
-                        ($vehiculo['estado'] === 'rechazado' ? 'bg-danger' : 'bg-warning text-dark') ?>">
+                    <?= $vehiculo['estado'] === 'aprobado' ? 'bg-success' : ($vehiculo['estado'] === 'rechazado' ? 'bg-danger' : 'bg-warning text-dark') ?>">
                     <?= ucfirst($vehiculo['estado']) ?>
                   </span>
                 </p>
@@ -212,8 +211,8 @@ if (!empty($busqueda)) {
 
                 <!-- Botón para modal de rechazo -->
                 <button type="button" class="btn btn-rechazar btn-sm" data-bs-toggle="modal"
-                        data-bs-target="#modalRechazo" data-id="<?= $vehiculo['id'] ?>"
-                        <?= $vehiculo['estado'] !== 'pendiente' ? 'disabled' : '' ?>>
+                  data-bs-target="#modalRechazo" data-id="<?= $vehiculo['id'] ?>"
+                  <?= $vehiculo['estado'] !== 'pendiente' ? 'disabled' : '' ?>>
                   <i class="bi bi-x-circle"></i> Rechazar
                 </button>
               </div>
@@ -221,7 +220,7 @@ if (!empty($busqueda)) {
           </div>
         <?php endforeach; ?>
       </div>
-  <?php endif; ?>
+    <?php endif; ?>
   </div>
 
   <!-- Modal de rechazo -->
@@ -267,4 +266,5 @@ if (!empty($busqueda)) {
     });
   </script>
 </body>
+
 </html>

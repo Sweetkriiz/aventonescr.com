@@ -67,28 +67,56 @@ include('includes/navbar.php');
     </div>
   </section>
 
-
+    <!-- Notificiacion de vehiculo aprobado o rechazado -->
   <?php
   if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare("
-            SELECT marca, modelo 
-            FROM vehiculos 
-            WHERE idChofer = ? AND estado = 'rechazado' AND leido = 0
-            LIMIT 1
-        ");
+    SELECT marca, modelo, estado 
+    FROM vehiculos 
+    WHERE idChofer = ? AND leido = 0
+    LIMIT 1
+  ");
     $stmt->execute([$_SESSION['user_id']]);
     $v = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($v) {
+      $rolActual = $_SESSION['rol'] ?? 'pasajero';
+      $mensaje = '';
+      $clase = '';
+      $linkDestino = '';
+
+      switch ($v['estado']) {
+        case 'rechazado':
+          $mensaje = "Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>rechazado</b>.";
+          $clase = 'alert-danger';
+          // Si el usuario es chofer, lo mantiene en su panel de chofer
+          $linkDestino = ($rolActual === 'chofer')
+            ? 'listar_vehiculo.php'
+            : 'dashboard_pasajero.php';
+          break;
+
+        case 'pendiente':
+          $mensaje = "Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> está en <b>revisión</b>.";
+          $clase = 'alert-warning';
+          $linkDestino = 'dashboard_pasajero.php';
+          break;
+
+        case 'aprobado':
+          $mensaje = " Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>aprobado</b>.";
+          $clase = 'alert-success';
+          $linkDestino = 'listar_vehiculo.php';
+          break;
+      }
+
       echo "
-            <div class='alert alert-warning d-flex align-items-center shadow-sm border-0 rounded-3 mt-3 mx-auto' role='alert' style='max-width: 700px;'>
-                <i class='bi bi-exclamation-triangle-fill me-2 fs-5'></i>
-                <div class='flex-grow-1 text-start'>
-                    Tu vehículo <strong>{$v['marca']} {$v['modelo']}</strong> fue <b>rechazado</b>.
-                    <a href='dashboard_pasajero.php' class='alert-link'>Ver detalles</a>.
-                </div>
-            </div>
-            ";
+      <div class='alert {$clase} d-flex align-items-center shadow-sm border-0 rounded-3 mt-3 mx-auto' role='alert' style='max-width: 700px;'>
+        <i class='bi bi-info-circle-fill me-2 fs-5'></i>
+        <div class='flex-grow-1 text-start'>
+          {$mensaje}
+          <a href='{$linkDestino}' class='alert-link'>Ver detalles</a>.
+        </div>
+      </div>
+    ";
     }
   }
   ?>

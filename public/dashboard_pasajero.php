@@ -168,16 +168,23 @@ if ($vehiculo && $vehiculo['estado'] === 'aprobado' && $_SESSION['rol'] !== 'cho
                     <td><?= htmlspecialchars($s['fecha']) ?></td>
                     <td>
                       <?php
+                      // Mapeo completo de estados con texto + color + ícono
+                      $mapaEstados = [
+                        'pendiente' => ['texto' => 'Pendiente', 'color' => 'warning', 'icono' => 'bi-hourglass-split'],
+                        'aceptada' => ['texto' => 'Aceptada', 'color' => 'success', 'icono' => 'bi-check-circle'],
+                        'rechazada' => ['texto' => 'Rechazada', 'color' => 'danger', 'icono' => 'bi-x-circle'],
+                        'cancelada_por_pasajero' => ['texto' => 'Cancelado por pasajero', 'color' => 'secondary', 'icono' => 'bi-person-x'],
+                        'cancelada_por_chofer' => ['texto' => 'Cancelado por chofer', 'color' => 'dark', 'icono' => 'bi-car-front'],
+                      ];
+
                       $estado = strtolower($s['estadoReserva']);
-                      $color = match ($estado) {
-                        'pendiente' => 'warning',
-                        'aceptada' => 'success',
-                        'rechazada' => 'danger',
-                        default => 'secondary'
-                      };
+                      $info = $mapaEstados[$estado] ?? ['texto' => ucfirst($estado), 'color' => 'secondary', 'icono' => 'bi-question-circle'];
                       ?>
-                      <span class="badge bg-<?= $color ?>"><?= ucfirst($s['estadoReserva']) ?></span>
+                      <span class="badge bg-<?= $info['color'] ?> d-inline-flex align-items-center gap-1">
+                        <i class="bi <?= $info['icono'] ?>"></i> <?= $info['texto'] ?>
+                      </span>
                     </td>
+
                   </tr>
                 <?php endforeach; ?>
               </tbody>
