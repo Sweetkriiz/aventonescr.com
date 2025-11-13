@@ -1,11 +1,12 @@
 <?php
-require_once __DIR__ . '/database.php'; 
+require_once __DIR__ . '/database.php';
 
 define('UPLOADS_PATH', '/aventones/uploads');
 
 
 // Obtener todos los vehículos de un chofer
-function getVehiculosByChofer($idChofer) {
+function getVehiculosByChofer($idChofer)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM vehiculos WHERE idChofer = ? AND estado = 'aprobado' ORDER BY idVehiculo DESC");
     $stmt->execute([$idChofer]);
@@ -14,7 +15,8 @@ function getVehiculosByChofer($idChofer) {
 
 
 // Obtener vehículo por ID
-function getVehiculoById($id) {
+function getVehiculoById($id)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM vehiculos WHERE idVehiculo = ?");
     $stmt->execute([$id]);
@@ -22,7 +24,8 @@ function getVehiculoById($id) {
 }
 
 // Crear vehículo nuevo (queda pendiente de aprobación)
-function createVehiculo($idChofer, $marca, $modelo, $anio, $color, $placa, $fotografia = null) {
+function createVehiculo($idChofer, $marca, $modelo, $anio, $color, $placa, $fotografia = null)
+{
     global $pdo;
 
     // Verificar si ya existe una placa igual
@@ -52,8 +55,9 @@ function createVehiculo($idChofer, $marca, $modelo, $anio, $color, $placa, $foto
 
 
 // Actualizar vehículo y volver a estado pendiente
-function actualizarVehiculo($id, $marca, $modelo, $anio, $color, $placa) {
-   global $pdo;
+function actualizarVehiculo($id, $marca, $modelo, $anio, $color, $placa)
+{
+    global $pdo;
     $stmt = $pdo->prepare("
         UPDATE vehiculos
         SET marca = ?, modelo = ?, anio = ?, color = ?, placa = ?, estado = 'pendiente'
@@ -64,14 +68,16 @@ function actualizarVehiculo($id, $marca, $modelo, $anio, $color, $placa) {
 
 
 // Eliminar vehículo
-function deleteVehiculo($id) {
+function deleteVehiculo($id)
+{
     global $pdo;
     $stmt = $pdo->prepare("DELETE FROM vehiculos WHERE idVehiculo = ?");
     return $stmt->execute([$id]);
 }
 
 // Obtener vehículos pendientes de aprobación
-function getVehiculosPendientes($idChofer) {
+function getVehiculosPendientes($idChofer)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM vehiculos WHERE idChofer = ? AND estado = 'pendiente' ORDER BY idVehiculo DESC");
     $stmt->execute([$idChofer]);
@@ -80,7 +86,8 @@ function getVehiculosPendientes($idChofer) {
 
 
 // Validar datos del formulario
-function validateVehiculo($marca, $modelo, $anio, $color, $placa) {
+function validateVehiculo($marca, $modelo, $anio, $color, $placa)
+{
     $errors = [];
 
     if (empty(trim($marca)) || strlen($marca) > 50) {
@@ -107,7 +114,8 @@ function validateVehiculo($marca, $modelo, $anio, $color, $placa) {
 }
 
 // Obtener vehículos aprobados de un chofer
-function getVehiculosAprobados($idChofer) {
+function getVehiculosAprobados($idChofer)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT idVehiculo, marca, modelo, placa FROM vehiculos WHERE idChofer = ? AND estado = 'aprobado'");
     $stmt->execute([$idChofer]);
@@ -115,7 +123,8 @@ function getVehiculosAprobados($idChofer) {
 }
 
 //  Esto es cuando el pasajero quiere ser chofer
-function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $foto) {
+function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $foto)
+{
     global $pdo;
     try {
         // Insertar el vehículo en estado pendiente
@@ -149,7 +158,10 @@ function createVehiculoPasajero($idUsuario, $marca, $modelo, $placa, $color, $fo
     }
 }
 
-
-?>
-
-
+function getVehiculosRechazados($idChofer)
+{
+    global $pdo;
+    $stmt = $pdo->prepare("SELECT * FROM Vehiculos WHERE idChofer = ? AND estado = 'rechazado'");
+    $stmt->execute([$idChofer]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
